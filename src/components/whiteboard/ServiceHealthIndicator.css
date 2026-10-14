@@ -1,12 +1,12 @@
 /* Service Health Indicator — Whiteboard & Command Center */
 
 .service-health-indicator {
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md, 6px);
   border: 1px solid var(--panel-border, #e2e8f0);
   background: var(--surface-1, #ffffff);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  margin-block: 6px;
+  margin-block: 2px;
   container-type: inline-size;
   transition:
     border-color 0.2s ease,
@@ -31,8 +31,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 14px;
-  gap: 12px;
+  padding: 3px 10px;
+  gap: 8px;
+  min-height: 24px;
 }
 
 .service-health-indicator__toggle {
@@ -141,7 +142,7 @@
   gap: 5px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--primary, #0284c7);
+  color: var(--primary, #0f766e);
   text-decoration: none;
   padding: 4px 8px;
   border-radius: 4px;
@@ -153,8 +154,8 @@
 }
 
 .service-health-indicator__direct-link:hover {
-  background: rgba(2, 132, 199, 0.08);
-  border-color: rgba(2, 132, 199, 0.2);
+  background: rgba(15, 118, 110, 0.08);
+  border-color: rgba(15, 118, 110, 0.2);
 }
 
 .service-health-indicator__direct-link:focus-visible {
@@ -250,8 +251,8 @@
 }
 
 .service-health-indicator__item--low .service-health-indicator__severity-tag {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #ccfbf1;
+  color: #0f766e;
 }
 
 .service-health-indicator__3m-tag {
@@ -296,7 +297,7 @@
 .service-health-indicator__footer-link {
   font-size: 12px;
   font-weight: 600;
-  color: var(--primary, #0284c7);
+  color: var(--primary, #0f766e);
   text-decoration: none;
 }
 

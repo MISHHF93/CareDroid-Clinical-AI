@@ -243,7 +243,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--medical-ink-subtle, #9ca3af);
+  color: var(--medical-ink-subtle, #64748b);
 }
 
 /* Nested fieldset legend from ProfileRoleSwitcher: keep one Session heading */

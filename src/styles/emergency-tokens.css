@@ -27,7 +27,7 @@
     --color-text-secondary,
     var(--app-fg-muted, var(--medical-ink-muted, #6b7280))
   );
-  --ed-text-meta: var(--color-text-muted, var(--medical-ink-subtle, #9ca3af));
+  --ed-text-meta: var(--color-text-muted, var(--medical-ink-subtle, #64748b));
 
   --ed-border-subtle: var(--app-border-subtle, var(--medical-border, #e2e8f0));
   --ed-border-strong: color-mix(

@@ -8,7 +8,7 @@
   box-sizing: border-box;
   margin: 0 auto;
   background: var(--navy-bg);
-  padding: var(--space-6);
+  padding: var(--compact-panel-padding, clamp(12px, 1.5vw, 20px));
 }
 
 /* Header */
@@ -16,8 +16,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--space-8);
-  gap: var(--space-6);
+  margin-bottom: var(--compact-panel-gap, 16px);
+  gap: var(--compact-panel-gap, 16px);
 }
 
 /* HEAL-186: was an <h1>, demoted to a <p> (see TeamManagement.tsx) so this page no longer
@@ -71,7 +71,7 @@
   border: 1px solid rgba(255, 107, 107, 0.3);
   border-radius: var(--radius-md);
   color: var(--app-danger);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--compact-panel-gap, 12px);
 }
 
 .team-error button {
@@ -85,7 +85,7 @@
 
 /* Search */
 .team-search {
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--compact-panel-gap, 12px);
 }
 
 .team-search-input {

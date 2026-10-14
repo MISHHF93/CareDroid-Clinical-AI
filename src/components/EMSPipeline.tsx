@@ -755,27 +755,6 @@ export default function EMSPipeline() {
           />
         ) : null}
 
-        <div className="ems-pipeline__interactive-ai">
-          <EmsInteractiveAssistPanel
-            role={emergencyRole.role || 'paramedic'}
-            userId={emergencyRole.canonicalProfile?.id}
-            organizationId={emergencyRole.canonicalProfile?.organizationId}
-            patientId={
-              emsArrivals.find(
-                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
-              )?.patientId
-            }
-            emsUnitId={
-              emsArrivals.find(
-                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
-              )?.unitId ||
-              emsArrivals.find(
-                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
-              )?.unitName
-            }
-          />
-        </div>
-
         {emsModule.loading && !emsArrivals.length ? (
           <p className="ems-pipeline__empty" role="status">
             Loading CareDroid EMS intake...
@@ -851,18 +830,6 @@ export default function EMSPipeline() {
               ) : null}
 
               <section className="ems-pipeline__section" ref={incomingSectionRef}>
-                <PreArrivalForm
-                  store={preArrivalStore}
-                  canSubmit={canSubmitPreArrival}
-                  actorName={emergencyRole.roleLabel}
-                  notificationSource="ems-crew"
-                  onSubmitted={(result) => {
-                    if (result?.patient?.id) {
-                      openPatient(result.patient.id);
-                    }
-                  }}
-                  className="ems-pipeline__pre-arrival-form"
-                />
                 <div className="ems-pipeline__section-heading">
                   <Ambulance size={17} aria-hidden />
                   <h2>Incoming</h2>
@@ -900,6 +867,18 @@ export default function EMSPipeline() {
                     </p>
                   )}
                 </div>
+                <PreArrivalForm
+                  store={preArrivalStore}
+                  canSubmit={canSubmitPreArrival}
+                  actorName={emergencyRole.roleLabel}
+                  notificationSource="ems-crew"
+                  onSubmitted={(result) => {
+                    if (result?.patient?.id) {
+                      openPatient(result.patient.id);
+                    }
+                  }}
+                  className="ems-pipeline__pre-arrival-form"
+                />
               </section>
             </>
           ) : null}
@@ -943,6 +922,26 @@ export default function EMSPipeline() {
               </div>
             </section>
           ) : null}
+        </div>
+        <div className="ems-pipeline__interactive-ai">
+          <EmsInteractiveAssistPanel
+            role={emergencyRole.role || 'paramedic'}
+            userId={emergencyRole.canonicalProfile?.id}
+            organizationId={emergencyRole.canonicalProfile?.organizationId}
+            patientId={
+              emsArrivals.find(
+                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
+              )?.patientId
+            }
+            emsUnitId={
+              emsArrivals.find(
+                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
+              )?.unitId ||
+              emsArrivals.find(
+                (a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff',
+              )?.unitName
+            }
+          />
         </div>
       </div>
     </EmergencyRoutePage>

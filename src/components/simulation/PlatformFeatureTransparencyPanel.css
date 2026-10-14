@@ -72,7 +72,7 @@
 
 .platform-feature-transparency__meta {
   font-size: 11px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .platform-feature-transparency__status {

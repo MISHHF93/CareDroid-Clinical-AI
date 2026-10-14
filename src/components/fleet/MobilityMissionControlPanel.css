@@ -1,0 +1,572 @@
+/* ── Mobility Mission Control Panel ───────────────────────────────── */
+.mobility-mission-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--compact-panel-gap, 10px);
+  padding: var(--compact-panel-padding, 12px);
+  border-radius: var(--compact-panel-radius, 8px);
+  background: var(--app-surface-1, var(--medical-white, #ffffff));
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  box-shadow: var(--medical-shadow-soft, 0 1px 3px rgba(15, 23, 42, 0.05));
+  font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+}
+
+.mobility-mission-control__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  padding-bottom: 8px;
+}
+
+.mobility-mission-control__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobility-mission-control__icon-badge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--medical-accent-tint, #e0f2fe);
+  color: var(--medical-accent, #0284c7);
+}
+
+.mobility-mission-control__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+  line-height: 1.2;
+}
+
+.mobility-mission-control__subtitle {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.mobility-mission-control__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mission-select {
+  height: var(--compact-control-height, 32px);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+  cursor: pointer;
+}
+
+.mission-refresh-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--medical-slate-50, #f8fafc);
+  color: var(--medical-ink, #334155);
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.mission-refresh-btn:hover {
+  background: var(--medical-slate-100, #f1f5f9);
+}
+
+.new-mission-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--compact-control-height, 32px);
+  padding: 0 12px;
+  border-radius: 6px;
+  border: none;
+  background: var(--medical-accent, #0284c7);
+  color: var(--app-on-solid, #ffffff);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.new-mission-btn:hover {
+  background: var(--medical-accent-hover, #0369a1);
+}
+
+/* ── Split Workspace ───────────────────────────────────────────── */
+.mobility-mission-control__workspace {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--compact-panel-gap, 10px);
+}
+
+@media (max-width: 860px) {
+  .mobility-mission-control__workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Queue Column (Left) ───────────────────────────────────────── */
+.mobility-mission-control__queue-col {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: var(--compact-panel-radius, 6px);
+  padding: 8px;
+  background: var(--medical-slate-50, #f8fafc);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.queue-col__header h4 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--medical-ink, #1e293b);
+}
+
+.queue-col__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.mission-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.mission-item:hover {
+  border-color: var(--medical-accent, #0ea5e9);
+  background: var(--medical-accent-tint, #f0f9ff);
+}
+
+.mission-item--selected {
+  border-color: var(--medical-accent, #0284c7);
+  background: var(--medical-accent-tint, #f0f9ff);
+  box-shadow: 0 0 0 1px var(--medical-accent, #0284c7);
+}
+
+.mission-item__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.mission-item__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--medical-ink, #0f172a);
+  line-height: 1.25;
+}
+
+.mission-item__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.mission-item__route {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.route-node {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.queue-col__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 8px;
+  color: var(--medical-ink-muted, #475569);
+  font-size: 11.5px;
+}
+
+/* ── Cockpit Column (Right) ────────────────────────────────────── */
+.mobility-mission-control__cockpit-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.cockpit-card {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: var(--compact-panel-radius, 6px);
+  padding: 12px;
+  background: var(--app-surface-1, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cockpit-card--empty {
+  display: grid;
+  place-items: center;
+  padding: 40px 12px;
+  color: var(--medical-ink-subtle, #64748b);
+  font-size: 12px;
+}
+
+.cockpit-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--medical-border, #f1f5f9);
+  padding-bottom: 8px;
+}
+
+.cockpit-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.cockpit-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+}
+
+.cockpit-card__eta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.cockpit-card__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+/* ── Waypoints ─────────────────────────────────────────────────── */
+.waypoints-grid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--medical-slate-50, #f8fafc);
+  border: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.waypoint-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 12px;
+}
+
+.waypoint-type {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--medical-accent, #0284c7);
+  letter-spacing: 0.05em;
+}
+
+.waypoint-type--dest {
+  color: #15803d;
+}
+
+.waypoint-arrow {
+  color: var(--medical-ink-subtle, #94a3b8);
+}
+
+/* ── Payload & Cold Chain ──────────────────────────────────────── */
+.payload-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--medical-slate-50, #f8fafc);
+  border: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.payload-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.payload-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Operator Supervisor Overrides Bar ─────────────────────────── */
+.cockpit-card__controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--medical-border, #cbd5e1);
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--medical-ink-muted, #475569);
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ctrl-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.ctrl-btn:hover:not(:disabled) {
+  background: var(--medical-slate-100, #f1f5f9);
+}
+
+.ctrl-btn--pause:hover:not(:disabled) {
+  border-color: #d97706;
+  color: #b45309;
+}
+
+.ctrl-btn--reroute:hover:not(:disabled) {
+  border-color: var(--medical-accent, #0284c7);
+  color: var(--medical-accent, #0284c7);
+}
+
+.ctrl-btn--return:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+.ctrl-btn--verify {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #15803d;
+  border-color: #15803d;
+  color: var(--app-on-solid, #ffffff);
+}
+
+.ctrl-btn--verify:hover:not(:disabled) {
+  background: #166534;
+  border-color: #166534;
+  color: #ffffff;
+}
+
+/* ── Badges ────────────────────────────────────────────────────── */
+.priority-chip,
+.status-chip {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.priority-chip--neutral,
+.status-chip--neutral {
+  background: #e2e8f0;
+  color: #475569;
+}
+.priority-chip--info,
+.status-chip--info {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+.priority-chip--warning,
+.status-chip--warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+.priority-chip--critical,
+.status-chip--critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.status-chip--success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* ── Modal Dialog ──────────────────────────────────────────────── */
+.mission-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.mission-modal {
+  width: 100%;
+  max-width: 540px;
+  background: var(--app-surface-1, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--medical-border, #cbd5e1);
+  overflow: hidden;
+}
+
+.mission-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.mission-modal__header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+}
+
+.mission-modal__close-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--medical-ink-subtle, #64748b);
+  cursor: pointer;
+}
+
+.mission-modal__form {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--medical-ink-muted, #475569);
+}
+
+.form-group input,
+.form-group select {
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 4px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  font-size: 12px;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+}
+
+.mission-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--medical-border, #e2e8f0);
+  padding-top: 10px;
+}
+
+.modal-cancel-btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: transparent;
+  color: var(--medical-ink, #475569);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-submit-btn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 4px;
+  border: none;
+  background: var(--medical-accent, #0284c7);
+  color: var(--app-on-solid, #ffffff);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-submit-btn:hover {
+  background: var(--medical-accent-hover, #0369a1);
+}

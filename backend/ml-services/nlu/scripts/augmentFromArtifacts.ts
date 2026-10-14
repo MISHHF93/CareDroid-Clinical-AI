@@ -39,7 +39,9 @@ function dedupeExamples(examples: NluExample[]): NluExample[] {
 function examplesFromArtifacts(): NluExample[] {
   if (!existsSync(ARTIFACT_CATALOG)) return [];
 
-  const artifacts = JSON.parse(readFileSync(ARTIFACT_CATALOG, 'utf8')) as Array<Record<string, unknown>>;
+  const artifacts = JSON.parse(readFileSync(ARTIFACT_CATALOG, 'utf8')) as Array<
+    Record<string, unknown>
+  >;
   const generated: NluExample[] = [];
 
   for (const artifact of artifacts) {
@@ -82,7 +84,8 @@ function augmentNluCorpusFromArtifacts(): void {
   writeJsonlDataset(CORPUS_PATH, merged);
 
   console.log(`High-quality NLU examples: ${merged.length}`);
-  if (recovery.length) console.log(`Recovered ${recovery.length} examples from train/val/test splits`);
+  if (recovery.length)
+    console.log(`Recovered ${recovery.length} examples from train/val/test splits`);
   console.log(`Wrote ${CORPUS_PATH}`);
 }
 

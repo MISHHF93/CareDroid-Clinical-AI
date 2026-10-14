@@ -34,18 +34,21 @@ async function main() {
 
   await AppDataSource.initialize();
   try {
-    const stale: Array<{ id: string; mrn: string; arrivalTime: string }> = await AppDataSource.query(
-      `SELECT id, mrn, arrivalTime FROM patients
+    const stale: Array<{ id: string; mrn: string; arrivalTime: string }> =
+      await AppDataSource.query(
+        `SELECT id, mrn, arrivalTime FROM patients
        WHERE id LIKE 'perf-%' AND mrn LIKE 'PERF-%' AND arrivalTime < ?`,
-      [cutoffIso],
-    );
+        [cutoffIso],
+      );
 
     if (stale.length === 0) {
       console.log(`No stale perf-* fixture patients older than ${olderThanHours}h found.`);
       return;
     }
 
-    console.log(`Found ${stale.length} stale perf-* fixture patient(s) older than ${olderThanHours}h:`);
+    console.log(
+      `Found ${stale.length} stale perf-* fixture patient(s) older than ${olderThanHours}h:`,
+    );
     for (const row of stale) {
       console.log(`  ${row.id} (${row.mrn}), arrived ${row.arrivalTime}`);
     }

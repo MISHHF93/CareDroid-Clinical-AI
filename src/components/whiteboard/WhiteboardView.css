@@ -111,8 +111,8 @@
 }
 
 .whiteboard-view__select:focus-visible {
-  border-color: #0284c7;
-  outline: 2px solid rgba(2, 132, 199, 0.25);
+  border-color: var(--cdl-brand-600, #0f766e);
+  outline: 2px solid rgba(15, 118, 110, 0.25);
   outline-offset: 1px;
 }
 
@@ -138,7 +138,7 @@
 }
 
 .whiteboard-view__clear-filters:focus-visible {
-  outline: 2px solid var(--app-focus-ring-aa, #0284c7);
+  outline: 2px solid var(--app-focus-ring-aa, #0f766e);
   outline-offset: 2px;
 }
 

@@ -1,7 +1,30 @@
-import { useMemo, type ReactNode } from 'react';
+import { Component, useMemo, useState, type ReactNode } from 'react';
 import useRovingTabs from '../../hooks/useRovingTabs';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import PatientCard from '../../components/PatientCard';
+
+class CardErrorBoundary extends Component<
+  { children: ReactNode; patientId?: string },
+  { error: Error | null }
+> {
+  state = { error: null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: any) {
+    console.error('PATIENT_CARD_CRASH in patient', this.props.patientId, error, info);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="card-error" style={{ color: 'red', border: '1px solid red', padding: 8 }}>
+          Card Error: {(this.state.error as Error).message}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
@@ -332,8 +355,25 @@ export function MetricGrid({ metrics }) {
   );
 }
 
-export function PatientGrid({ patients, emptyMessage }) {
-  if (!patients.length) {
+export function PatientGrid({
+  patients,
+  emptyMessage,
+  pageSize = 8,
+}: {
+  patients: any[];
+  emptyMessage: string;
+  pageSize?: number;
+}) {
+  const [page, setPage] = useState(1);
+  const total = patients.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  // Reset page if it exceeds totalPages
+  const activePage = Math.min(page, totalPages);
+  const startIdx = (activePage - 1) * pageSize;
+  const currentBatch = patients.slice(startIdx, startIdx + pageSize);
+
+  if (!total) {
     return (
       <div
         role="status"
@@ -346,17 +386,99 @@ export function PatientGrid({ patients, emptyMessage }) {
   }
 
   return (
-    <div
-      className="emergency-route-patient-grid cdl-patient-board"
-      data-cdl-surface="board"
-      role="list"
-      aria-label="Patient cards"
-    >
-      {patients.map((patient) => (
-        <div key={patient.id} className="cdl-patient-board__item" role="listitem">
-          <PatientCard patient={patient} />
+    <div className="cdl-patient-grid-container">
+      {totalPages > 1 ? (
+        <div
+          className="cdl-patient-grid-pagination"
+          role="navigation"
+          aria-label="Patient grid pagination"
+        >
+          <span className="cdl-patient-grid-pagination__info">
+            Showing{' '}
+            <strong>
+              {startIdx + 1}–{Math.min(startIdx + pageSize, total)}
+            </strong>{' '}
+            of <strong>{total}</strong> patients
+            <span className="cdl-patient-grid-pagination__page-count">
+              {' '}
+              · Page {activePage} of {totalPages}
+            </span>
+          </span>
+          <div className="cdl-patient-grid-pagination__controls">
+            <button
+              type="button"
+              className="cdl-pagination-btn"
+              disabled={activePage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              aria-label="Previous page"
+            >
+              Previous
+            </button>
+            <span className="cdl-pagination-counter" aria-current="page">
+              {activePage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              className="cdl-pagination-btn"
+              disabled={activePage >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              aria-label="Next page"
+            >
+              Next
+            </button>
+          </div>
         </div>
-      ))}
+      ) : null}
+
+      <div
+        className="emergency-route-patient-grid cdl-patient-board"
+        data-cdl-surface="board"
+        role="list"
+        aria-label="Patient cards"
+      >
+        {currentBatch.map((patient) => (
+          <div key={patient.id} className="cdl-patient-board__item" role="listitem">
+            <CardErrorBoundary patientId={patient.id}>
+              <PatientCard patient={patient} />
+            </CardErrorBoundary>
+          </div>
+        ))}
+      </div>
+
+      {totalPages > 1 ? (
+        <div
+          className="cdl-patient-grid-pagination cdl-patient-grid-pagination--bottom"
+          role="navigation"
+          aria-label="Patient grid bottom pagination"
+        >
+          <span className="cdl-patient-grid-pagination__info">
+            Showing {startIdx + 1}–{Math.min(startIdx + pageSize, total)} of {total}
+          </span>
+          <div className="cdl-patient-grid-pagination__controls">
+            <button
+              type="button"
+              className="cdl-pagination-btn"
+              disabled={activePage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              aria-label="Previous page"
+            >
+              Previous
+            </button>
+            <span className="cdl-pagination-counter">
+              {activePage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              className="cdl-pagination-btn"
+              disabled={activePage >= totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              aria-label="Next page"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

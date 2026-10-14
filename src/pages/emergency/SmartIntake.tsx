@@ -530,7 +530,7 @@ export default function SmartIntake({
         const resolvedSessionId =
           result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId;
         setSessionId(resolvedSessionId);
-        setStatusMessage('Backend Smart Intake contract loaded for staff review.');
+        setStatusMessage('Identity review pipeline ready for staff verification.');
         // This branch's sessionId isn't a genuine identity-session id, so
         // fetching /audit-log against it would 404 and silently fall back to
         // the SAME demo audit log this function exists to clear — skip it.
@@ -1041,6 +1041,7 @@ export default function SmartIntake({
         <div className="smart-intake__ai-hint" data-testid="smart-intake-ai-hint">
           <button
             type="button"
+            className="smart-intake__ai-hint-btn"
             onClick={() => void requestVerificationHint()}
             disabled={aiHintLoading}
           >

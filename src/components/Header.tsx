@@ -43,6 +43,7 @@ import UserAccountMenu from './account/UserAccountMenu';
 import OperationalAlertRail from './emergency/OperationalAlertRail';
 import OperationsCenterMenu from './chrome/OperationsCenterMenu';
 import ThemeToggle from './chrome/ThemeToggle';
+import DensityToggle from './chrome/DensityToggle';
 import { isPilotStationKpiPolicyActive } from '../config/stationKpiPolicy';
 import './Header.css';
 
@@ -208,7 +209,7 @@ export function Header() {
       navigateEmergencyRoute(getReceptionQuickCreatePath());
       return;
     }
-    navigateEmergencyRoute(CANONICAL_ROUTES.emergencyWhiteboard);
+    navigateEmergencyRoute(`${CANONICAL_ROUTES.emergencyWhiteboard}?intake=1`);
     window.setTimeout(() => document.dispatchEvent(new Event('open-intake')), 0);
   };
 
@@ -551,6 +552,7 @@ export function Header() {
             </button>
           ) : null}
 
+          <DensityToggle />
           <ThemeToggle />
 
           <OperationsCenterMenu />

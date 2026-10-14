@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { DensityProvider } from '../contexts/DensityContext';
 import { UserProvider } from '../contexts/UserContext';
 import { ConversationProvider } from '../contexts/ConversationContext';
 import { ToolPreferencesProvider } from '../contexts/ToolPreferencesContext';
@@ -26,30 +27,32 @@ type AppProvidersProps = Readonly<{
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ThemeProvider>
-      <UserProvider>
-        <WorkspaceProvider>
-          <ToolPreferencesProvider>
-            <TenantContextProvider>
-              <UserIdentityProvider>
-                <OrganizationContextProvider>
-                  <WhiteLabelProvider>
-                    <ConversationProvider>
-                      <SystemConfigProvider>
-                        <OfflineProvider>
-                          <SimulationModeProvider>
-                            <ThreeMinuteTimerEngineMount />
-                            {children}
-                          </SimulationModeProvider>
-                        </OfflineProvider>
-                      </SystemConfigProvider>
-                    </ConversationProvider>
-                  </WhiteLabelProvider>
-                </OrganizationContextProvider>
-              </UserIdentityProvider>
-            </TenantContextProvider>
-          </ToolPreferencesProvider>
-        </WorkspaceProvider>
-      </UserProvider>
+      <DensityProvider>
+        <UserProvider>
+          <WorkspaceProvider>
+            <ToolPreferencesProvider>
+              <TenantContextProvider>
+                <UserIdentityProvider>
+                  <OrganizationContextProvider>
+                    <WhiteLabelProvider>
+                      <ConversationProvider>
+                        <SystemConfigProvider>
+                          <OfflineProvider>
+                            <SimulationModeProvider>
+                              <ThreeMinuteTimerEngineMount />
+                              {children}
+                            </SimulationModeProvider>
+                          </OfflineProvider>
+                        </SystemConfigProvider>
+                      </ConversationProvider>
+                    </WhiteLabelProvider>
+                  </OrganizationContextProvider>
+                </UserIdentityProvider>
+              </TenantContextProvider>
+            </ToolPreferencesProvider>
+          </WorkspaceProvider>
+        </UserProvider>
+      </DensityProvider>
     </ThemeProvider>
   );
 }

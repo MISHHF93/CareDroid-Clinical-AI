@@ -52,7 +52,7 @@
   padding: 10px 16px;
   border: none;
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: #374151;
+  background: var(--cdl-brand-600, #0f766e);
   color: var(--app-on-solid, #ffffff);
   font-weight: 700;
   font-size: 0.8125rem;
@@ -143,8 +143,10 @@
 
 .dc-field-input {
   width: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
+  min-height: 32px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
   border: 1px solid var(--medical-border, #e2e8f0);
   background: var(--medical-surface-page, #f8fafc);
   color: var(--medical-ink, #111827);
@@ -193,7 +195,7 @@
 
 .dc-link-accent {
   font-size: 13px;
-  color: var(--medical-accent, #64748b);
+  color: var(--cdl-brand-600, #0f766e);
   text-decoration: none;
   font-weight: 600;
 }

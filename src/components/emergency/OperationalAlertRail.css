@@ -186,3 +186,18 @@
     animation: none;
   }
 }
+
+@media (max-width: 1024px) {
+  .cdl-kpi-capsule {
+    gap: 4px;
+    height: 26px;
+    padding: 0 8px;
+    max-width: 130px !important;
+  }
+  .cdl-kpi-capsule__value {
+    font-size: 11.5px;
+  }
+  .cdl-kpi-capsule__label {
+    font-size: 10px;
+  }
+}

@@ -10,10 +10,20 @@ import { MANIFEST_PATH, resolveClassifierPath } from '../../shared/paths';
 import { resolveExecutorToolId } from '../../shared/routing-maps';
 
 const SAMPLES = [
-  { text: 'Calculate SOFA score for ICU patient with hypotension', expectIntent: 'sofa_score_calculation', expectArtifact: 'calculator' },
+  {
+    text: 'Calculate SOFA score for ICU patient with hypotension',
+    expectIntent: 'sofa_score_calculation',
+    expectArtifact: 'calculator',
+  },
   { text: 'Can warfarin be combined with aspirin safely?', expectIntent: 'drug_interaction_check' },
-  { text: 'Potassium is 6.1 mEq/L — interpret this lab result', expectIntent: 'lab_interpretation' },
-  { text: 'Patient is coding — need immediate emergency response', expectIntent: 'emergency_alert' },
+  {
+    text: 'Potassium is 6.1 mEq/L — interpret this lab result',
+    expectIntent: 'lab_interpretation',
+  },
+  {
+    text: 'Patient is coding — need immediate emergency response',
+    expectIntent: 'emergency_alert',
+  },
   { text: 'What causes hyponatremia in heart failure?', expectIntent: 'general_clinical_query' },
   { text: 'SOFA Score Calculator', expectArtifact: 'calculator' },
   { text: '/tools/calculators/sofa', expectArtifact: 'calculator' },
@@ -43,8 +53,10 @@ async function main(): Promise<void> {
   const nlu = loadAnyClassifier(nluPath);
   const art = loadAnyClassifier(artPath);
   const warmup = await embedText('warmup clinical query');
-  const nluEmbDim = nlu.embeddingDim ?? ('w1' in nlu ? nlu.w1[0]?.length : nlu.weights?.[0]?.length) ?? 0;
-  const artEmbDim = art.embeddingDim ?? ('w1' in art ? art.w1[0]?.length : art.weights?.[0]?.length) ?? 0;
+  const nluEmbDim =
+    nlu.embeddingDim ?? ('w1' in nlu ? nlu.w1[0]?.length : nlu.weights?.[0]?.length) ?? 0;
+  const artEmbDim =
+    art.embeddingDim ?? ('w1' in art ? art.w1[0]?.length : art.weights?.[0]?.length) ?? 0;
   const nluHidden = 'hiddenDim' in nlu ? nlu.hiddenDim : 'n/a';
   const artHidden = 'hiddenDim' in art ? art.hiddenDim : 'n/a';
 

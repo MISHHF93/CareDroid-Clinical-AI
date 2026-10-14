@@ -111,7 +111,7 @@
 .patient-card-copilot__tool-action small {
   display: block;
   margin-top: 3px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 10px;
   font-weight: 500;
 }

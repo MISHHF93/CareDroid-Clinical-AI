@@ -33,7 +33,7 @@
 
 .ems-offload-attention-strip__subtitle {
   margin: 4px 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
 }
 
@@ -62,7 +62,7 @@
 }
 
 .ems-offload-attention-strip__counts small {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 10px;
   text-transform: uppercase;
 }
@@ -149,14 +149,14 @@
 }
 
 .ems-offload-attention-strip__primary small {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .ems-offload-attention-strip__metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 11px;
 }
 

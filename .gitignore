@@ -4,6 +4,7 @@ agent-tools/
 **/scratchpad/
 artifact-*.html
 caredroid-scorecard*.html
+scratch/
 
 # Logs
 logs
@@ -70,6 +71,7 @@ pages-map.txt
 /qa/playwright-responsive-report.json
 /qa/responsive-qa-summary.json
 /qa/page-screenshots/
+/qa/screenshots/
 /qa/showcase/
 /qa/dashboard-resize-audit/*.png
 scripts/*.cjs

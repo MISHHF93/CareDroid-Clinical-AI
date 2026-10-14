@@ -78,13 +78,14 @@
 .chief-investigation-panel__run-button,
 .chief-investigation-panel__rerun-button {
   justify-self: start;
-  border: 0;
-  border-radius: 10px;
-  background: #0ea5e9;
+  border: 1px solid var(--cdl-brand-700, #0f766e);
+  border-radius: var(--cdl-radius-md, 6px);
+  background: var(--cdl-brand-600, #0f766e);
   color: #ffffff;
   font-weight: 700;
   font-size: 13px;
-  padding: 9px 14px;
+  padding: 6px 14px;
+  min-height: 32px;
   cursor: pointer;
 }
 
@@ -95,13 +96,14 @@
 }
 
 .chief-investigation-panel__refresh-button {
-  border: 1px solid var(--medical-border, #e0f2fe);
-  border-radius: 10px;
-  background: var(--medical-surface-card, #ffffff);
-  color: var(--medical-text-muted, #6b7280);
+  border: 1px solid var(--cdl-border, #cbd5e1);
+  border-radius: var(--cdl-radius-md, 6px);
+  background: var(--cdl-surface-card, #ffffff);
+  color: var(--cdl-ink-muted, #475569);
   font-weight: 600;
   font-size: 12.5px;
-  padding: 9px 14px;
+  padding: 6px 14px;
+  min-height: 32px;
   cursor: pointer;
 }
 
@@ -129,7 +131,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--medical-card-fg-subtle, #9ca3af);
+  color: var(--medical-card-fg-subtle, #64748b);
   font-size: 11px;
   font-weight: 600;
 }
@@ -198,7 +200,7 @@
 }
 
 .chief-investigation-panel__steps li[data-tone='info'] {
-  border-left-color: var(--medical-card-fg-subtle, #9ca3af);
+  border-left-color: var(--medical-card-fg-subtle, #64748b);
 }
 
 .chief-investigation-panel__step-label {
@@ -253,7 +255,7 @@
 
 .chief-investigation-panel__prepared-actions h4 {
   margin: 0;
-  color: var(--medical-card-fg-subtle, #9ca3af);
+  color: var(--medical-card-fg-subtle, #64748b);
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.06em;

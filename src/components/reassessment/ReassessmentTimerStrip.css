@@ -16,7 +16,7 @@
 }
 
 .reassessment-timer-strip__pill small {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.04em;

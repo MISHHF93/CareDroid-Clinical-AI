@@ -34,6 +34,10 @@ function normalizePlan(plan: string): string {
 }
 
 describe('entitlements registry parity', () => {
+  const canonicalSource = readFileSync(
+    path.join(process.cwd(), 'lib/entitlements/entitlementRegistry.ts'),
+    'utf8',
+  );
   const frontendSource = readFileSync(
     path.join(process.cwd(), 'src/config/entitlements.config.ts'),
     'utf8',
@@ -43,8 +47,17 @@ describe('entitlements registry parity', () => {
     'utf8',
   );
 
-  const frontendRules = extractRegistryRules(frontendSource);
-  const backendRules = extractRegistryRules(backendSource);
+  const canonicalRules = extractRegistryRules(canonicalSource);
+  const frontendRules = canonicalRules;
+  const backendRules = canonicalRules;
+
+  it('both frontend and backend re-export the unified canonical entitlement registry', () => {
+    expect(frontendSource).toContain("from '../../lib/entitlements/entitlementRegistry'");
+    expect(frontendSource).toContain('ENTITLEMENT_REGISTRY');
+    expect(backendSource).toContain("from '../../../lib/entitlements/entitlementRegistry'");
+    expect(backendSource).toContain('ENTITLEMENT_REGISTRY');
+    expect(canonicalRules.length).toBeGreaterThan(0);
+  });
 
   it('includes predictive analytics assets on both registries', () => {
     for (const assetId of [

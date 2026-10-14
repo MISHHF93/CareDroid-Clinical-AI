@@ -19,7 +19,7 @@
 
 .identity-field-review header p {
   margin: 0;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 11px;
 }
 
@@ -100,7 +100,7 @@ html[data-theme='dark'] .identity-field-review__bulk {
 }
 
 .identity-field-review__field span {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 10px;
 }
 
@@ -112,7 +112,7 @@ html[data-theme='dark'] .identity-field-review__bulk {
 }
 
 .identity-field-review__field dt {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -172,7 +172,7 @@ html[data-theme='dark'] .identity-field-review__bulk {
   min-width: 16px;
   height: 16px;
   border-radius: 3px;
-  background: var(--color-text-secondary, #9ca3af);
+  background: var(--color-text-secondary, #64748b);
   color: #fff;
   font-size: 8px;
   font-weight: 800;

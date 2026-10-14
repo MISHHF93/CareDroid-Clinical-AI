@@ -16,8 +16,8 @@ export type SurveillanceIntegrationDomain =
   | 'facilities'
   | 'clinical_ops'
   | 'patient_safety'
-  | 'race_day'
-  | 'equine_welfare'
+  | 'emergency_response'
+  | 'infection_control'
   | 'hospital_ops'
   | 'audit';
 
@@ -35,10 +35,10 @@ export interface FacilityZone {
     | 'triage'
     | 'ambulance_bay'
     | 'patient_safety'
-    | 'paddock'
-    | 'track'
+    | 'intake_bay'
+    | 'transit_corridor'
     | 'back_of_house'
-    | 'welfare';
+    | 'care_unit';
   privacyTier: 'public' | 'operational' | 'restricted' | 'welfare_safe';
   geofence?: {
     coordinateSystem: string;

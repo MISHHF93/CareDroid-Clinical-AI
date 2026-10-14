@@ -132,7 +132,12 @@ export function trainClassifier(
     epochLosses.push(totalLoss / n);
 
     if (hasVal) {
-      const valLoss = meanCrossEntropyLoss(weights, bias, validation!.embeddings, validation!.labels);
+      const valLoss = meanCrossEntropyLoss(
+        weights,
+        bias,
+        validation!.embeddings,
+        validation!.labels,
+      );
       valLosses.push(valLoss);
       if (valLoss < (bestValLoss as number)) {
         bestValLoss = valLoss;

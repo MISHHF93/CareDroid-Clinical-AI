@@ -30,7 +30,12 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     heading: /discover caredroid capabilities/i,
   },
   { id: 'workflows', path: '/workflows', match: 'heading-text', heading: /^workflows$/i },
-  { id: 'operations', path: '/operations', match: 'heading-text', heading: /default operations/i },
+  {
+    id: 'operations',
+    path: '/operations',
+    match: 'heading-text',
+    heading: /clinical & hospital operations/i,
+  },
   // CareDroidPage-based (HEAL-185): these register their title into the shell chrome instead of
   // rendering their own <h1> -- match on text, not heading role (mirrors PlatformGovernanceWorkspace's
   // established 'heading-text' pattern from HEAL-169).

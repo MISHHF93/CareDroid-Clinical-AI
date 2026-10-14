@@ -1,4 +1,10 @@
 import { SubscriptionTier } from '../modules/subscriptions/entities/subscription.entity';
+import {
+  ENTITLEMENT_REGISTRY as CANONICAL_ENTITLEMENT_REGISTRY,
+  SUBSCRIPTION_TIER_RANK as CANONICAL_SUBSCRIPTION_TIER_RANK,
+  getEntitlementRuleForAsset as canonicalGetEntitlementRuleForAsset,
+  subscriptionMeetsRequirement as canonicalSubscriptionMeetsRequirement,
+} from '../../../lib/entitlements/entitlementRegistry';
 
 export enum EntitlementCategory {
   TOOLS = 'tools',
@@ -31,149 +37,19 @@ export interface EntitlementRule {
   adminOnly?: boolean;
 }
 
-const CORE_PACK = 'core-platform';
+export const ENTITLEMENT_REGISTRY: EntitlementRule[] =
+  CANONICAL_ENTITLEMENT_REGISTRY as unknown as EntitlementRule[];
 
-export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
-  {
-    assetIds: ['calculators', 'calculators-hub', 'qsofa', 'news2', 'sofa-score'],
-    category: EntitlementCategory.CALCULATORS,
-    featureFlagId: 'clinical-calculators',
-    requiredPlan: SubscriptionTier.FREE,
-    requiredPackIds: [CORE_PACK],
-  },
-  {
-    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis'],
-    category: EntitlementCategory.TOOLS,
-    featureFlagId: 'clinical-tools-core',
-    requiredPlan: SubscriptionTier.FREE,
-    requiredPackIds: [CORE_PACK],
-  },
-  {
-    assetIds: ['simulation-suite', 'scenario-player', 'simulation-outcomes'],
-    category: EntitlementCategory.SIMULATIONS,
-    featureFlagId: 'simulation-suite',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: ['research-education'],
-  },
-  {
-    assetIds: ['automation-news2-clinician-notification', 'automation-potassium-lab-workflow'],
-    category: EntitlementCategory.AUTOMATIONS,
-    featureFlagId: 'clinical-tools-core',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: ['emergency-department-pack'],
-  },
-  {
-    assetIds: ['automation-device-offline-maintenance'],
-    category: EntitlementCategory.AUTOMATIONS,
-    featureFlagId: 'medical-iot-dashboard',
-    requiredPlan: SubscriptionTier.ENTERPRISE,
-    requiredPackIds: ['medical-iot-pack'],
-  },
-  {
-    assetIds: ['automation-audit-event-review', 'automation-integration-unsupported-labeling'],
-    category: EntitlementCategory.AUTOMATIONS,
-    featureFlagId: 'ai-governance-center',
-    requiredPlan: SubscriptionTier.ENTERPRISE,
-    requiredPackIds: ['governance-compliance-pack'],
-  },
-  {
-    assetIds: ['hospital-map', 'digital-twin', 'live-map'],
-    category: EntitlementCategory.MAPS,
-    featureFlagId: 'maps-hospital-operations',
-    requiredPlan: SubscriptionTier.INSTITUTIONAL,
-    requiredPackIds: ['hospital-operations'],
-  },
-  {
-    assetIds: ['medical-iot', 'telemetry-monitoring', 'device-fleet-management'],
-    category: EntitlementCategory.IOT,
-    featureFlagId: 'medical-iot-dashboard',
-    requiredPlan: SubscriptionTier.INSTITUTIONAL,
-    requiredPackIds: ['hospital-operations'],
-  },
-  {
-    assetIds: [
-      'fleet-dashboard',
-      'fleet-live-map',
-      'route-optimizer',
-      'predictive-maintenance',
-      'dispatch-ai',
-    ],
-    category: EntitlementCategory.FLEET,
-    featureFlagId: 'fleet-command',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: ['fleet-logistics'],
-  },
-  {
-    assetIds: [
-      'admission-prediction',
-      'journey-prediction',
-      'command-predictive-alerts',
-      'predictive-analytics-dashboard',
-    ],
-    category: EntitlementCategory.AI_AGENTS,
-    featureFlagId: 'predictive-analytics-pack',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: ['emergency-department-pack', 'analytics-pack'],
-  },
-  {
-    assetIds: ['patient-whiteboard', 'patient-room-display', 'digital-door-sign'],
-    category: EntitlementCategory.TOOLS,
-    featureFlagId: 'patient-experience-pack',
-    requiredPlan: SubscriptionTier.FREE,
-    requiredPackIds: ['emergency-department-pack'],
-  },
-  {
-    assetIds: ['ems-pre-arrival', 'pre-arrival-activation', 'trauma-team-activation'],
-    category: EntitlementCategory.TOOLS,
-    featureFlagId: 'ems-pre-arrival-pack',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: ['emergency-department-pack'],
-  },
-  {
-    assetIds: [
-      'agent-clinical',
-      'agent-operations',
-      'agent-lab',
-      'agent-fleet',
-      'agent-education',
-      'agent-research',
-    ],
-    category: EntitlementCategory.AI_AGENTS,
-    featureFlagId: 'ai-clinical-copilot',
-    requiredPlan: SubscriptionTier.PROFESSIONAL,
-    requiredPackIds: [CORE_PACK],
-  },
-  {
-    assetIds: ['ai-governance', 'clinical-audit', 'ai-explainability', 'regulatory', 'audit-logs'],
-    category: EntitlementCategory.GOVERNANCE,
-    featureFlagId: 'ai-governance-center',
-    requiredPlan: SubscriptionTier.INSTITUTIONAL,
-    requiredPackIds: [CORE_PACK],
-    adminOnly: true,
-  },
-];
-
-export const SUBSCRIPTION_TIER_RANK: Record<SubscriptionTier, number> = {
-  [SubscriptionTier.FREE]: 0,
-  [SubscriptionTier.TRIAL]: 0,
-  [SubscriptionTier.STARTER]: 0,
-  [SubscriptionTier.PROFESSIONAL]: 1,
-  [SubscriptionTier.ACADEMIC]: 1,
-  [SubscriptionTier.INSTITUTIONAL]: 2,
-  [SubscriptionTier.ENTERPRISE]: 2,
-  [SubscriptionTier.GOVERNMENT]: 2,
-};
+export const SUBSCRIPTION_TIER_RANK: Record<SubscriptionTier, number> =
+  CANONICAL_SUBSCRIPTION_TIER_RANK as Record<SubscriptionTier, number>;
 
 export function getEntitlementRuleForAsset(assetId: string): EntitlementRule | undefined {
-  return ENTITLEMENT_REGISTRY.find((rule) => rule.assetIds.includes(assetId));
+  return canonicalGetEntitlementRuleForAsset(assetId) as EntitlementRule | undefined;
 }
 
 export function subscriptionMeetsRequirement(
   currentTier: SubscriptionTier | string | undefined,
-  requiredTier: SubscriptionTier = SubscriptionTier.FREE,
-) {
-  return (
-    (SUBSCRIPTION_TIER_RANK[currentTier as SubscriptionTier] ?? -1) >=
-    (SUBSCRIPTION_TIER_RANK[requiredTier] ?? SUBSCRIPTION_TIER_RANK[SubscriptionTier.FREE])
-  );
+  requiredTier: SubscriptionTier | string = SubscriptionTier.FREE,
+): boolean {
+  return canonicalSubscriptionMeetsRequirement(currentTier, requiredTier);
 }

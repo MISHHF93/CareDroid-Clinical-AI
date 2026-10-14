@@ -1,89 +1,114 @@
 .pad-page {
-  background: #f8fafc;
-  min-height: 100vh;
-  padding: 24px 28px;
-  font-family: Inter, system-ui, sans-serif;
+  background: var(--app-surface-page, var(--medical-surface-page, #f8fafc));
+  min-height: 0;
+  padding: clamp(14px, 1.8vw, 24px);
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+  display: grid;
+  gap: var(--cdl-zone-gap, 14px);
+  box-sizing: border-box;
+}
+
+.pad-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--cdl-panel-gap, 14px);
+  flex-wrap: wrap;
+  margin-bottom: 2px;
 }
 
 .pad-page-title {
   margin: 0;
-  font-size: 22px;
+  font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 800;
-  color: #111827;
+  color: var(--medical-text-heading, var(--app-text-primary, #111827));
 }
 
 .pad-page-subtitle {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #475569;
+  color: var(--medical-text-muted, var(--app-text-muted, #475569));
 }
 
 .pad-demo-notice {
-  background: #fffbeb;
-  border: 1px solid #b45309;
-  border-radius: 8px;
+  background: color-mix(
+    in srgb,
+    var(--semantic-attention, #f59e0b) 12%,
+    var(--app-surface-1, #fff)
+  );
+  border: 1px solid color-mix(in srgb, var(--semantic-attention, #f59e0b) 40%, transparent);
+  border-radius: var(--compact-panel-radius, 8px);
   padding: 8px 14px;
   font-size: 12px;
-  color: var(--semantic-attention);
-  margin-bottom: 16px;
+  color: var(--semantic-attention, #b45309);
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .pad-summary-strip {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: var(--compact-panel-gap, 12px);
+  margin-bottom: 4px;
 }
 
 .pad-summary-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 14px 18px;
-  flex: 1 1 140px;
+  background: var(--cdl-surface-card, var(--app-surface-1, #ffffff));
+  border: 1px solid
+    color-mix(in srgb, var(--cdl-border, var(--app-border, #e2e8f0)) 75%, transparent);
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 12px 16px;
   min-width: 0;
+  box-shadow: var(--cdl-elev-1, var(--compact-shadow, 0 1px 3px rgba(0, 0, 0, 0.04)));
 }
 
 .pad-eyebrow-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #475569;
+  color: var(--medical-text-muted, var(--app-text-muted, #475569));
   margin-bottom: 6px;
 }
 
 .pad-search-wrap {
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
 
 .pad-search-input {
   width: 100%;
   max-width: 420px;
-  padding: 8px 14px;
+  padding: 4px 10px;
+  min-height: var(--compact-control-height, 32px);
   font-size: 13px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #111827;
+  border: 1px solid var(--app-border, #cbd5e1);
+  border-radius: var(--compact-panel-radius, 6px);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--app-fg, #111827);
   outline: none;
   box-sizing: border-box;
+}
+
+.pad-search-input:focus {
+  border-color: var(--app-accent, #0284c7);
+  outline: var(--app-focus-ring);
+  outline-offset: 1px;
 }
 
 .pad-empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #475569;
+  color: var(--medical-text-muted, var(--app-text-muted, #475569));
   font-size: 14px;
 }
 
 .pad-model-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: var(--compact-page-gap, 14px);
 }
 
 .pad-score-bar {
@@ -97,7 +122,7 @@
   flex: 1;
   height: 8px;
   border-radius: 4px;
-  background: #e2e8f0;
+  background: var(--app-surface-2, #e2e8f0);
   overflow: hidden;
 }
 
@@ -111,21 +136,22 @@
 .pad-card-title {
   font-weight: 700;
   font-size: 15px;
-  color: #111827;
+  color: var(--medical-text-heading, var(--app-text-primary, #111827));
 }
 
 .pad-card-subtitle {
   font-size: 12px;
-  color: #475569;
+  color: var(--medical-text-muted, var(--app-text-muted, #475569));
   margin-top: 2px;
 }
 
 .pad-confidence-value {
-  color: #111827;
+  color: var(--app-fg, #111827);
+  font-variant-numeric: tabular-nums;
 }
 
 .pad-expanded-detail {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--app-border, #e2e8f0);
   padding-top: 12px;
   display: flex;
   flex-direction: column;
@@ -134,9 +160,9 @@
 
 .pad-signal-row {
   font-size: 13px;
-  color: #111827;
+  color: var(--app-fg, #111827);
   padding: 3px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--app-border, #e2e8f0);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -144,9 +170,9 @@
 
 .pad-action-row {
   font-size: 13px;
-  color: #111827;
+  color: var(--app-fg, #111827);
   padding: 3px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--app-border, #e2e8f0);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -154,13 +180,24 @@
 
 .pad-open-button {
   align-self: flex-start;
-  background: #0ea5e9;
+  background: var(--cdl-brand-600, #0f766e);
   color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 14px;
+  border: 1px solid var(--cdl-brand-700, #0f766e);
+  border-radius: var(--cdl-radius-md, 6px);
+  padding: 5px 12px;
+  min-height: var(--compact-control-height, 28px);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   margin-top: 4px;
+}
+
+html[data-theme='dark'] .pad-summary-card,
+html[data-theme='dark'] .pad-search-input {
+  background: var(--app-surface-1, #1e293b);
+  border-color: var(--app-border, #334155);
+}
+
+html[data-theme='dark'] .pad-score-track {
+  background: var(--app-surface-2, #334155);
 }

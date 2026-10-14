@@ -35,7 +35,9 @@ for (const [id, template] of Object.entries(PromptTemplateRegistry)) {
   }
 }
 
-if (!AISafetyRules.requiredDisclaimers.some((disclaimer) => /Human review required/i.test(disclaimer))) {
+if (
+  !AISafetyRules.requiredDisclaimers.some((disclaimer) => /Human review required/i.test(disclaimer))
+) {
   errors.push('AISafetyRules: missing Human review required disclaimer');
 }
 
@@ -47,4 +49,6 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`AI configuration verification passed (${Object.keys(AIConfigRegistry).length} services, ${Object.keys(PromptTemplateRegistry).length} prompt templates).`);
+console.log(
+  `AI configuration verification passed (${Object.keys(AIConfigRegistry).length} services, ${Object.keys(PromptTemplateRegistry).length} prompt templates).`,
+);

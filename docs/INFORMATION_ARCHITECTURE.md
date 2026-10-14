@@ -1,108 +1,137 @@
 # CareDroid Clinical Intelligence Platform — Information Architecture (IA)
 
-**Document Version:** 2.2.0  
-**Status:** Living Architectural Specification / Navigation Authority  
-**Author:** CareDroid Healthcare Informatics & Enterprise Architecture  
+**Document Version:** 3.0.0  
+**Status:** Canonical Information Architecture & Navigation Authority  
+**Lead Authors:** UX/Product Design Lead, Healthcare Informatics Architect, Principal Enterprise Architect  
+**Classification:** Enterprise Healthcare Architecture & Due Diligence Authority  
 
 ---
 
-## 1. Executive Overview
+## 1. Executive Information Architecture Overview
 
-CareDroid’s Information Architecture organizes complex clinical operations into intuitive, role-tailored cognitive zones. Rather than presenting clinicians with monolithic database forms, CareDroid arranges workflows around the patient’s longitudinal emergency journey, department surge dynamics, and clinical decision points.
+CareDroid’s Information Architecture structures complex acute care operations into clear, cognitive zones tailored to 23 distinct healthcare personas. Rather than presenting monolithic EHR tables or nested menus, CareDroid organizes screens around the patient’s longitudinal emergency journey, real-time department surge dynamics, and rapid bedside decision points.
 
 ---
 
-## 2. Core Route Hierarchy & Canonical Topology
+## 2. Canonical Route Tree, Aliases & Redirect Topology
 
-The platform’s routes are strictly governed by `src/config/routes.config.ts` and `src/lib/users/canonicalAccess.ts`:
+All live clinical workspaces are governed by the authoritative route registry in `src/config/routes.config.ts`. All legacy un-prefixed URLs redirect automatically to their canonical `/emergency/*` paths:
 
 ```
-CareDroid Root (/)
+Root (/)
+├── Authentication & Onboarding
+│   ├── /login                     (Auth login screen with 2FA support)
+│   ├── /register                  (Practitioner registration)
+│   ├── /auth/forgot-password      (Self-service credential recovery)
+│   └── /auth/invite               (Department workspace invite onboarding)
 │
-├── Clinical Operations (/emergency)
-│   ├── Reception & Intake (/reception)
-│   │   ├── Self-Arrival Kiosk (/kiosk/arrival)
-│   │   └── Fast Demographic Intake
-│   ├── Clinical Triage (/triage)
-│   │   ├── CTAS / ESI Acuity Assignment
-│   │   └── Initial Vital Sign Recording
-│   ├── Department Whiteboard (/whiteboard)
-│   │   ├── Patient Grid View (By Bed / Pod / Zone)
-│   │   ├── Patient Detail Drawer
-│   │   └── Quick Order / Status Entry
-│   ├── Active Encounters & Patient Directory (/patients)
-│   │   └── Patient Longitudinal Detail View
-│   ├── Inbound EMS & Ambulance Bay (/ems)
-│   │   ├── Pre-arrival Telemetry Feed
-│   │   └── Handoff Documentation & Bed Allocation
-│   ├── Bed Capacity & Surge Management (/capacity)
-│   │   ├── Bed Board & Flow Bottlenecks
-│   │   └── Admission Holding / Boarding Queue
-│   └── Reassessment & Deterioration Watch (/reassessment)
-│       └── Timed Reassessment Due Alerts
+├── Canonical Emergency Operations (/emergency)
+│   ├── /emergency/dispatch        (911 dispatch ingestion, EMS assignment, 3-min response)
+│   ├── /emergency/ems             (Inbound ambulance telemetry, pre-alerts, handoff sign-off)
+│   ├── /emergency/ed-readiness    (Pre-allocation of trauma rooms & resuscitation bays)
+│   ├── /emergency/reception       (Walk-in intake, demographic lookup, queue tracking)
+│   ├── /emergency/self-arrival    (Patient-facing self-service kiosk mode)
+│   ├── /emergency/triage          (CTAS acuity scoring, physiological vitals entry, red flags)
+│   ├── /emergency/whiteboard      (Department tracking grid across Resus, Acute, Subacute pods)
+│   ├── /emergency/patient-room    (Bedside terminal view for nurses & rounding physicians)
+│   ├── /emergency/patients        (Longitudinal encounter directory & medical records)
+│   ├── /emergency/queues          (Multi-pod waiting lists sorted by clinical urgency)
+│   ├── /emergency/reassessment    (Scheduled nursing vital reassessments & overdue flags)
+│   ├── /emergency/capacity        (Surge levels, inpatient bed boarding bottlenecks, ALC queue)
+│   ├── /emergency/tools           (Clinical tool catalog, calculators, pediatric dosing checker)
+│   ├── /emergency/command-center  (Department macro operations, staffing, wait-time curves)
+│   ├── /emergency/pulse           (Chief Investigation bottleneck analytics & shift scorecards)
+│   ├── /emergency/copilot         (Interactive clinical context assistant & scribe workspace)
+│   ├── /emergency/analytics       (Historical ministry wait-time metrics, LWBS trends)
+│   ├── /emergency/simulation      (Digital Twin emergency department disaster surge simulation)
+│   └── /emergency/federated-learning (Regional hospital AI model improvement console)
 │
-├── Clinical Intelligence & Decision Support (/tools)
-│   ├── Pediatric Dosing & Safety Checker (/tools?open=pediatric-dose-safety-checker)
-│   ├── Clinical Calculators Hub (/tools?filter=calculator)
-│   │   ├── Wells Score, PERC, Glasgow Coma Scale, HEART Score
-│   │   └── Renal Dosing Adjuster
-│   ├── AI Clinical Scribe & Copilot (/tools?filter=ai)
-│   └── Evidence & Guidance Reference (/tools?filter=guidance)
+├── Legacy Redirect Compatibility Map (Transparent 301 Aliases)
+│   ├── /whiteboard               ──► REDIRECT to /emergency/whiteboard
+│   ├── /triage                   ──► REDIRECT to /emergency/triage
+│   ├── /reception                ──► REDIRECT to /emergency/reception
+│   ├── /tools                    ──► REDIRECT to /emergency/tools
+│   ├── /ems                      ──► REDIRECT to /emergency/ems
+│   ├── /capacity                 ──► REDIRECT to /emergency/capacity
+│   ├── /analytics                ──► REDIRECT to /emergency/analytics
+│   └── /queue                    ──► REDIRECT to /emergency/queues
 │
-├── Communications & Alerts (/alerts)
-│   ├── Critical Lab Value Broadcasts
-│   ├── Sepsis & Deterioration Alerts
-│   └── Multi-Disciplinary Messaging (/messages)
-│
-├── Operational Analytics & Executive Intelligence (/analytics)
-│   ├── Door-to-Doctor Time Benchmarks
-│   ├── Left Without Being Seen (LWBS) Risk Trends
-│   ├── Length of Stay (LOS) Modeling
-│   └── Physician & Nursing Shift Productivity
-│
-└── Governance, Platform & Profile
-    ├── System Administration (/admin)
-    │   ├── User RBAC / ABAC Permissions
-    │   ├── Bed & Pod Configuration
-    │   └── Audit Trail & Compliance Logs
-    ├── Organization Settings (/settings)
-    └── Clinical User Profile & Preferences (/profile)
-        ├── Role Switching (Demo / Training / Live)
-        └── Notification & Acoustic Settings
+└── Platform Governance & Administration
+    ├── /admin                     (Hospital system operations & facility settings)
+    ├── /admin/staff-workflows     (Clinical staff shifts, credentials & roster management)
+    ├── /executive                 (Hospital C-suite executive performance overview)
+    └── /profile                   (User settings, 2FA management, UI theme preferences)
 ```
 
 ---
 
-## 3. Persona-Driven Workspaces & Cognitive Profiles
+## 3. Screen Anatomy, Panels, Drawers & Modals
 
-| Persona | Primary Needs | Primary Workspace | Cognitive Reductions in UI |
-| :--- | :--- | :--- | :--- |
-| **Triage Nurse** | Fast vital entry, CTAS/ESI scoring, identifying high-risk red flags. | `/reception`, `/triage` | Simplified numeric keypad entry, high-contrast acuity chips, automatic red flag alerts. |
-| **Emergency Physician** | Real-time patient whiteboard, lab results, clinical calculators, disposition orders. | `/whiteboard`, `/tools` | Single-click patient inspection drawer, direct pediatric dosing checker, AI clinical note drafting. |
-| **Charge Nurse** | Macro-level department flow, bed capacity, surge state, inbound ambulances. | `/whiteboard`, `/capacity`, `/ems` | Visual bed occupancy maps, bottleneck indicators, ambulance arrival countdown timers. |
-| **Paramedic / EMS** | Seamless pre-hospital handoff, telemetry transmission. | `/ems` | Touch-first mobile card layout, rapid vitals dictation, electronic handoff sign-off. |
-| **Hospital Executive** | Regulatory compliance, wait times, staffing allocation, resource bottlenecks. | `/analytics` | Real-time KPI summaries, predictive surge forecasting, drill-down operational metrics. |
+CareDroid interfaces maintain a strict three-tier spatial hierarchy:
+
+```
++---------------------------------------------------------------------------------------------------+
+| TOP UTILITY BAR (52px)                                                                            |
+| [Logo] [Department Picker] [Sync Pulse] [Global Search ⌘K] [Theme Toggle] [User Persona Switcher]  |
++---------------------------------------------------------------------------------------------------+
+| ROUTE IDENTITY TAB (48px)                                                                        |
+| Breadcrumbs > Workspace Title (e.g. Emergency Whiteboard)              [Quick Actions: + Patient] |
++------------------------------------+--------------------------------------------------------------+
+| SIDEBAR NAVIGATION RAIL            | MAIN WORKSPACE VIEWPORT (Virtual Scrollport)                 |
+| (240px Expanded / 56px Collapsed)  |                                                              |
+|                                    | [Pod Filters: All | Resus | Acute A | Subacute B | Boarding] |
+| - Clinical Navigation              |                                                              |
+|   * Dispatch                       | +----------------------------------------------------------+ |
+|   * EMS Telemetry                  | | Rendered Patient Cards (Strict Max 18 in DOM)            | |
+|   * Reception & Intake             | | [Card 01] [Card 02] [Card 03] [Card 04]                  | |
+|   * Triage Workspace               | | [Card 05] [Card 06] [Card 07] [Card 08]                  | |
+|   * Whiteboard Tracking            | +----------------------------------------------------------+ |
+|   * Clinical Tools Hub             |                                                              |
+|   * Bed Capacity                   +--------------------------------------------------------------+
+|   * Command Center                 | SLIDE-OUT PATIENT INSPECTION DRAWER (480px / Overlaid Right) |
+| - Analytics & AI                   | - Demographics, Vital Trends, Lab Results, Orders Drafts     |
+|   * Pulse Analytics                | - Clinical Calculators Launchpad                             |
+|   * AI Copilot                     +--------------------------------------------------------------+
++------------------------------------+--------------------------------------------------------------+
+```
+
+### 3.1 Non-Disruptive Slide-Out Drawer
+- Width: `480px` on desktop, `100vw` full-width on mobile viewports (<768px).
+- Mounted over the active workspace with a soft scrim; pressing `Esc` or clicking outside dismisses the drawer while preserving the background scroll position and live WebSocket updates.
+
+### 3.2 Modal Hierarchy
+- **Critical Action Modals:** Used exclusively for irreversible actions:
+  - Code Blue / Trauma Team activation.
+  - Final patient discharge / disposition sign-off.
+  - Clinical medication order confirmation with allergy overrides.
+- All non-destructive information browsing occurs within drawers or tabs, never modals.
 
 ---
 
-## 4. Universal Navigation & Command Architecture
+## 4. Command Palette (⌘K) Architecture
 
-### 4.1 Omni-Search & Command Palette (`⌘K` / `Ctrl+K`)
-Clinicians frequently cannot take their hands off sterile keyboards to hunt through sidebar menus. The universal command palette allows instant keyboard navigation:
-- `Type MRN (e.g. 849201)` -> Jumps straight to patient’s active encounter chart.
-- `Type 'calc wells'` -> Opens Wells Score for PE calculator modal.
-- `Type 'ped dose'` -> Opens Pediatric Weight-based Dosing Checker.
-- `Type 'bed 4'` -> Highlights Pod B Bed 4 on the Whiteboard.
-
-### 4.2 Breadcrumbs & Spatial Orientation
-Located in the 72px Route Identity Band (`ShellRouteTab.tsx`), the breadcrumbs explicitly reflect the physical and logical location within the facility:
-`CareDroid › Emergency Department › Pod 2 Acute › Bed 14`
-
-### 4.3 Contextual Secondary Drawers
-To prevent clinicians from losing their primary spatial orientation on the whiteboard:
-- **Patient Detail Panel:** Slides out from the right (420px width), preserving the whiteboard background so the doctor never loses context of other patients in their pod.
-- **Reassessment Drawer:** Slides from right with high-risk color highlights for overdue vital reassessments.
-- **AI Copilot Panel:** Docks optionally to the right margin (380px width) with distinct violet AI provenance styling.
+The universal command launcher provides sub-50ms keyboard accessibility:
+- **Global Keybinding:** `⌘K` (macOS) / `Ctrl+K` (Windows/Linux).
+- **Index Domains:**
+  1. *Patients & Beds:* Instant search by MRN, patient initials, or room code (e.g. `Bed 04`).
+  2. *Canonical Workspaces:* Direct navigation to any route (e.g. `> Whiteboard`, `> Capacity`).
+  3. *Clinical Tools:* Direct execution of calculators (e.g. `calc wells`, `calc pediatric`).
+  4. *Actions:* System actions (e.g. `toggle theme`, `switch persona`, `export shift report`).
 
 ---
 
+## 5. Role-Based Visibility & Permission Masking
+
+In accordance with the principle of least privilege, the UI applies declarative visibility gating (`PermissionGate` and `RoleGate`):
+
+| UI Surface / Action | Required Canonical Permission | Behavior if Unauthorized |
+| :--- | :--- | :--- |
+| **Commit Triage Acuity** | `triage:commit` | Button disabled; shows tooltip *"Requires RN or MD role"*. |
+| **Pediatric Order Sign-off** | `order:sign` | Replaced by *"Draft Order for Physician Review"* button. |
+| **Reserve Resuscitation Bay** | `bed:allocate` | Hidden on paramedic and reception clerk profiles. |
+| **View Audit Trail Logs** | `audit:read` | Navigation item hidden; direct URL access renders 403 panel. |
+| **Emergency Whiteboard** | `whiteboard:read` | Core clinical surface; visible to all clinical staff personas. |
+
+---
+
+*This Information Architecture governs all layout components, route configurations, and navigation patterns.*

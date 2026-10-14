@@ -14,8 +14,40 @@
   overflow-x: auto;
 }
 
+.emergency-whiteboard-page__stat {
+  align-items: center;
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  border: 0;
+  border-right: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  justify-content: center;
+  gap: 6px;
+  min-height: 26px;
+  min-width: 0;
+  padding: 2px 10px;
+  text-align: center;
+}
+
+.emergency-whiteboard-page__stat-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.emergency-whiteboard-page__stat-label {
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .emergency-whiteboard-page__stat-label--tone-info {
-  color: #374151;
+  color: var(--cdl-ink-muted, #334155);
 }
 
 .emergency-whiteboard-page__stat-label--tone-warning {
@@ -45,7 +77,7 @@
   color: var(--status-stable, #16a34a);
 }
 .emergency-whiteboard-page__stat--tone-info .emergency-whiteboard-page__stat-value {
-  color: #374151;
+  color: var(--cdl-ink, #0f172a);
 }
 
 /* Tone-specific emphasized state overrides (extends base warning emphasis from part-03) */
@@ -71,10 +103,14 @@
   transition: background-color 110ms ease;
 }
 .emergency-whiteboard-page__stat--interactive:hover {
-  background: color-mix(in srgb, #374151 5%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--cdl-brand-500, #0d9488) 6%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
 }
 .emergency-whiteboard-page__stat--interactive:focus-visible {
-  outline: 2px solid #374151;
+  outline: 2px solid var(--cdl-brand-500, #0d9488);
   outline-offset: -2px;
   border-radius: 4px;
 }
@@ -84,8 +120,8 @@
   background: var(--color-surface, var(--app-surface-1, #ffffff));
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
-  gap: 10px;
-  padding: 12px 16px;
+  gap: 6px;
+  padding: 8px 16px;
 }
 
 .emergency-whiteboard-page__command-layer-header {
@@ -117,13 +153,14 @@
   background: var(--color-card, var(--app-surface-2, #ffffff));
   border: 1px solid
     var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
-  border-radius: var(--cdl-clinical-radius, 12px);
+  border-radius: var(--cdl-radius-md, 8px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  display: grid;
-  gap: 4px;
-  min-height: 68px;
-  padding: 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px;
   text-align: left;
 }
 
@@ -139,12 +176,15 @@
 
 .emergency-whiteboard-page__command-metric-value {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 22px;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.1;
 }
 
 .emergency-whiteboard-page__command-metric-label {
-  font-size: 12px;
-  font-weight: 850;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
 }
 
 .emergency-whiteboard-page__command-metric-label--critical {
@@ -160,7 +200,7 @@
 }
 
 .emergency-whiteboard-page__command-metric-label--info {
-  color: #374151;
+  color: var(--cdl-ink-muted, #334155);
 }
 
 /* Mission control */
@@ -168,9 +208,9 @@
   background: var(--color-background, var(--medical-surface-page, #f1f5f9));
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
-  gap: 12px;
+  gap: 8px;
   grid-template-columns: minmax(260px, 1.1fr) minmax(260px, 1fr) minmax(240px, 0.9fr);
-  padding: 16px;
+  padding: 10px 14px;
 }
 
 /* The 3-column grid above needs ~790px of content width (3 minmax floors +
@@ -187,29 +227,29 @@
 .emergency-whiteboard-page__mission-card {
   border: 1px solid
     var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
-  border-radius: var(--cdl-clinical-radius, 14px);
+  border-radius: var(--cdl-radius-md, 8px);
   background: var(--color-card, var(--app-surface-2, #ffffff));
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
-  padding: 12px;
+  padding: 8px 10px;
 }
 
 .emergency-whiteboard-page__mission-eyebrow {
   color: var(--status-info, var(--cdl-ink-subtle, #475569));
-  font-size: 11px;
-  font-weight: 900;
+  font-size: 10px;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .emergency-whiteboard-page__mission-title {
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 16px;
-  margin: 4px 0 8px;
+  font-size: 13px;
+  margin: 2px 0 6px;
 }
 
 .emergency-whiteboard-page__mission-actions {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -221,7 +261,8 @@
 
 .emergency-whiteboard-page__mission-card-heading {
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .emergency-whiteboard-page__mission-link-btn {
@@ -229,7 +270,8 @@
   border: 0;
   color: var(--status-info, var(--cdl-ink-subtle, #475569));
   cursor: pointer;
-  font-weight: 850;
+  font-weight: 750;
+  font-size: 11.5px;
 }
 
 .emergency-whiteboard-page__mission-link-btn:disabled {
@@ -239,30 +281,37 @@
 
 .emergency-whiteboard-page__mission-list {
   display: grid;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .emergency-whiteboard-page__mission-empty {
   color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
-  font-size: 13px;
+  font-size: 12px;
   margin: 0;
 }
 
 .emergency-whiteboard-page__mission-btn {
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 12px;
+  border-radius: 6px;
   color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 850;
-  min-height: 36px;
-  padding: 8px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  min-height: 28px;
+  padding: 4px 8px;
   text-align: left;
+  transition: all 120ms ease;
 }
 
 .emergency-whiteboard-page__mission-btn--primary {
-  background: var(--component-button-primary-bg, #374151);
+  background: var(--cdl-brand-600, #0f766e);
+  color: var(--cdl-on-brand, #ffffff);
+  border-color: var(--cdl-brand-700, #115e59);
+}
+
+.emergency-whiteboard-page__mission-btn--primary:hover {
+  background: var(--cdl-brand-700, #115e59);
 }
 
 .emergency-whiteboard-page__mission-btn--warning {
@@ -294,28 +343,29 @@
     );
   border-left: 2px solid
     color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 45%, transparent);
-  border-radius: var(--cdl-clinical-radius, 12px);
+  border-radius: var(--cdl-radius-md, 8px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: 1fr auto;
-  padding: 10px;
+  padding: 6px 8px;
 }
 
 .emergency-whiteboard-page__arrival-title {
   color: var(--color-text-primary, #111827);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .emergency-whiteboard-page__arrival-detail {
   color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
-  font-size: 12px;
-  margin: 3px 0 0;
+  font-size: 11px;
+  margin: 1px 0 0;
 }
 
 .emergency-whiteboard-page__arrival-actions {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .emergency-whiteboard-page__arrival-btn--prepare {
@@ -326,11 +376,13 @@
       var(--status-info, var(--cdl-ink-subtle, #475569)) 40%,
       var(--color-border-default, var(--medical-border, #e0f2fe))
     );
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--medical-status-info-text, #475569);
   cursor: pointer;
-  font-weight: 800;
-  padding: 5px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 6px;
+  min-height: 24px;
 }
 
 .emergency-whiteboard-page__arrival-btn--prepare:disabled {
@@ -350,11 +402,13 @@
       var(--status-stable, #10b981) 40%,
       var(--color-border-default, var(--medical-border, #e0f2fe))
     );
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--medical-status-success-text, #15803d);
   cursor: pointer;
-  font-weight: 800;
-  padding: 5px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 6px;
+  min-height: 24px;
 }
 
 .emergency-whiteboard-page__arrival-btn--convert:disabled {
@@ -465,36 +519,39 @@
   align-items: center;
   background: color-mix(
     in srgb,
-    var(--status-warning, #f59e0b) 10%,
+    var(--status-warning, #f59e0b) 8%,
     var(--color-surface, var(--app-surface-1, #ffffff))
   );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 6px;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 3px 12px;
+  min-height: 24px;
 }
 
 .emergency-whiteboard-page__awareness-banner-copy {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .emergency-whiteboard-page__awareness-banner-title {
   color: var(--medical-status-warning-text, #b45309);
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 750;
 }
 
 .emergency-whiteboard-page__awareness-banner-subtitle {
   color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
-  font-size: 12px;
+  font-size: 10.5px;
 }
 
 .emergency-whiteboard-page__awareness-banner-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
 .emergency-whiteboard-page__awareness-chip {
@@ -502,15 +559,17 @@
   border: 1px solid
     color-mix(
       in srgb,
-      var(--status-warning, #f59e0b) 40%,
+      var(--status-warning, #f59e0b) 35%,
       var(--color-border-subtle, var(--medical-border, #e0f2fe))
     );
   border-radius: 999px;
   color: var(--medical-status-warning-text, #b45309);
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 800;
-  padding: 6px 12px;
+  font-size: 10.5px;
+  font-weight: 700;
+  min-height: 20px;
+  padding: 1px 7px;
+  transition: all 120ms ease;
 }
 
 .emergency-whiteboard-page__awareness-panel {
@@ -573,13 +632,13 @@
   );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
-  gap: 8px;
-  padding: 10px 16px;
+  gap: 6px;
+  padding: 8px 16px;
 }
 
 .emergency-whiteboard-page__inbound-banner-title {
   color: var(--medical-status-info-text, #475569);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -587,7 +646,7 @@
 
 .emergency-whiteboard-page__inbound-banner-grid {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
@@ -601,24 +660,24 @@
     );
   border-left: 2px solid
     color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 45%, transparent);
-  border-radius: var(--cdl-clinical-radius, 12px);
+  border-radius: var(--cdl-radius-md, 8px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   color: var(--color-text-primary, #111827);
   cursor: pointer;
   display: grid;
-  gap: 4px;
-  padding: 10px 12px;
+  gap: 2px;
+  padding: 6px 10px;
   text-align: left;
 }
 
 .emergency-whiteboard-page__inbound-banner-card-detail {
-  color: #374151;
-  font-size: 12px;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 11.5px;
 }
 
 .emergency-whiteboard-page__inbound-banner-card-meta {
   color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .emergency-whiteboard-page__inbound-rail {
@@ -652,8 +711,8 @@
 }
 
 .emergency-whiteboard-page__inbound-hint {
-  color: #374151;
-  font-size: 12px;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 11.5px;
 }
 
 /* Filter controls */
@@ -662,26 +721,31 @@
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 6px;
   justify-content: space-between;
-  padding: 16px;
+  padding: 4px 12px;
+  min-height: 28px;
 }
 
 .emergency-whiteboard-page__filter-chip {
-  background: transparent;
+  background: var(--color-surface, var(--app-surface-1, #ffffff));
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
   color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   cursor: pointer;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 8px 14px;
+  min-height: 24px;
+  padding: 2px 8px;
+  line-height: 1.2;
+  transition: all 120ms ease;
 }
 
 .emergency-whiteboard-page__filter-chip--active {
-  background: color-mix(in srgb, #374151 12%, var(--app-surface-1, #ffffff));
-  border-color: color-mix(in srgb, #374151 30%, transparent);
-  color: #111827;
+  background: var(--cdl-brand-50, #f0fdfa);
+  border-color: var(--cdl-brand-500, #0d9488);
+  color: var(--cdl-brand-700, #0f766e);
+  font-weight: 700;
 }
 
 .emergency-whiteboard-page__filter-chip--reassess {
@@ -729,15 +793,23 @@
 
 /* Intake button */
 .emergency-whiteboard-page__intake-button {
-  background: var(--component-button-primary-bg, #374151);
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 12px;
-  color: var(--component-button-primary-fg, #f9fafb);
+  background: var(--cdl-brand-600, #0f766e);
+  border: 1px solid var(--cdl-brand-700, #115e59);
+  border-radius: var(--cdl-radius-md, 8px);
+  color: var(--cdl-on-brand, #ffffff);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 10px 14px;
+  min-height: 30px;
+  padding: 5px 12px;
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(15, 118, 110, 0.2);
+  transition: all 120ms ease;
+}
+
+.emergency-whiteboard-page__intake-button:not(:disabled):hover {
+  background: var(--cdl-brand-700, #115e59);
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.3);
 }
 
 .emergency-whiteboard-page__intake-button:disabled {
@@ -754,13 +826,13 @@
   flex-wrap: wrap;
   gap: 10px;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 8px 16px;
 }
 
 .emergency-whiteboard-page__queue-filter-label {
-  color: #374151;
-  font-size: 13px;
-  font-weight: 850;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .emergency-whiteboard-page__queue-filter-clear {
@@ -769,9 +841,9 @@
   border-radius: 999px;
   color: var(--color-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 850;
-  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 3px 8px;
 }
 
 /* Toast */
@@ -872,13 +944,17 @@
 
 .emergency-whiteboard-page__display-banner {
   align-items: center;
-  background: color-mix(in srgb, #374151 14%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--cdl-brand-600, #0f766e) 10%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 8px 16px;
 }
 
 .emergency-whiteboard-page__display-banner-copy {

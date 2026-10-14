@@ -1,7 +1,7 @@
 .route-optimizer-page {
   display: grid;
   gap: var(--compact-panel-gap, 14px);
-  padding: clamp(16px, 2vw, 28px);
+  padding: var(--compact-panel-padding, clamp(12px, 1.5vw, 20px));
 }
 
 .route-optimizer-page__header {
@@ -44,7 +44,7 @@
 
 .route-optimizer-page__field input,
 .route-optimizer-page__field select {
-  min-height: var(--compact-control-height, 40px);
+  min-height: var(--compact-control-height, 32px);
   padding: 8px 10px;
   border-radius: var(--compact-panel-radius, 10px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));
@@ -77,7 +77,7 @@
 }
 
 .route-optimizer-page__actions button {
-  min-height: var(--compact-control-height, 40px);
+  min-height: var(--compact-control-height, 32px);
   padding: 8px 14px;
   border-radius: var(--compact-panel-radius, 10px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));

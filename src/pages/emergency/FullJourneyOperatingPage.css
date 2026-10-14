@@ -25,13 +25,22 @@
   border-color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
+.fj-metric-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 105px), 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
 .fj-metric-chip {
   padding: 10px 14px;
   border-radius: 10px;
   background: var(--medical-surface-card, #ffffff);
   border: 1px solid var(--medical-border, #e2e8f0);
   min-width: 80px;
-  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .fj-metric-chip--warn {

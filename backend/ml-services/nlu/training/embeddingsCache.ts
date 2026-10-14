@@ -12,7 +12,8 @@ import path from 'path';
 import { embedText as embedTextUncached } from './embeddings';
 import { MODEL_CONFIG } from './training.config';
 
-const CACHE_PATH = process.env.EMBEDDING_CACHE_PATH ?? path.resolve(__dirname, '..', '..', 'embedding-cache.json');
+const CACHE_PATH =
+  process.env.EMBEDDING_CACHE_PATH ?? path.resolve(__dirname, '..', '..', 'embedding-cache.json');
 const CACHE_DISABLED = process.env.EMBEDDING_CACHE_DISABLED === 'true';
 const SAVE_EVERY = 200;
 
@@ -30,7 +31,11 @@ function cacheKey(text: string): string {
 }
 
 function isValidVector(value: unknown): value is number[] {
-  return Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'number' && Number.isFinite(v));
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((v) => typeof v === 'number' && Number.isFinite(v))
+  );
 }
 
 function loadCache(): Map<string, number[]> {
@@ -47,7 +52,9 @@ function loadCache(): Map<string, number[]> {
         }
       }
       if (invalidEntries > 0) {
-        console.log(`  [embedding-cache] discarded ${invalidEntries} corrupt entr${invalidEntries === 1 ? 'y' : 'ies'} from ${CACHE_PATH}`);
+        console.log(
+          `  [embedding-cache] discarded ${invalidEntries} corrupt entr${invalidEntries === 1 ? 'y' : 'ies'} from ${CACHE_PATH}`,
+        );
       }
     } catch {
       console.log(`  [embedding-cache] cache file unreadable, starting fresh: ${CACHE_PATH}`);
@@ -69,7 +76,9 @@ export function logEmbeddingCacheStats(): void {
   const total = hits + misses;
   if (total === 0) return;
   const hitRate = ((hits / total) * 100).toFixed(1);
-  console.log(`  [embedding-cache] ${hits}/${total} hits (${hitRate}%), ${misses} computed, path=${CACHE_PATH}`);
+  console.log(
+    `  [embedding-cache] ${hits}/${total} hits (${hitRate}%), ${misses} computed, path=${CACHE_PATH}`,
+  );
 }
 
 process.on('exit', () => {

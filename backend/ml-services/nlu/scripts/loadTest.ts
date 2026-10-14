@@ -66,7 +66,10 @@ async function runLoadTest(options: LoadTestOptions): Promise<void> {
   console.log(`  Mode: ${options.live ? 'Live Service' : 'Simulation'}`);
 
   const latencies: number[] = [];
-  const queue = Array.from({ length: options.requests }, (_, i) => SAMPLE_QUERIES[i % SAMPLE_QUERIES.length]);
+  const queue = Array.from(
+    { length: options.requests },
+    (_, i) => SAMPLE_QUERIES[i % SAMPLE_QUERIES.length],
+  );
 
   async function worker(): Promise<void> {
     while (queue.length > 0) {

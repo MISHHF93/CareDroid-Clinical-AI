@@ -42,9 +42,9 @@
 }
 
 .capability-discovery-page__actions a {
-  min-height: var(--compact-control-height, 40px);
-  padding: 8px 14px;
-  border-radius: var(--compact-panel-radius, 12px);
+  min-height: var(--compact-control-height, 32px);
+  padding: 6px 12px;
+  border-radius: var(--compact-panel-radius, 8px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));
   background: var(--medical-card-bg, var(--app-surface-1));
   text-decoration: none;
@@ -85,7 +85,7 @@
 }
 
 .capability-discovery-page__search {
-  min-height: var(--compact-control-height, 40px);
+  min-height: var(--compact-control-height, 32px);
   padding: 8px 12px;
   border-radius: var(--compact-panel-radius, 12px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));

@@ -8,7 +8,7 @@ import { ChiefInvestigationController } from './chief-investigation.controller';
 
 /**
  * First vertical slice of the Clinical Agent Command Platform.
- * See CLINICAL_AGENT_COMMAND_PLATFORM.md — this module proves the full chain:
+ * See CAREDROID_CLINICAL_PRODUCT_SPECIFICATION.md — this module proves the full chain:
  * human command -> context verification -> planning -> capability discovery ->
  * deterministic tool invocation -> evidence/provenance -> synthesis with
  * truthful states -> human approval gate (AiActionProposal) -> audit/event.

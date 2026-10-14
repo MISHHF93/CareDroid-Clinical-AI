@@ -52,11 +52,18 @@
 }
 
 .ciwa-save-btn {
-  background: #0ea5e9;
-  border: none;
-  color: var(--medical-ink, #111827);
-  border-radius: 10px;
-  padding: 10px 12px;
+  background: var(--cdl-brand-600, #0f766e);
+  border: 1px solid var(--cdl-brand-700, #0f766e);
+  color: #ffffff;
+  border-radius: var(--cdl-radius-md, 6px);
+  padding: 6px 14px;
+  min-height: 32px;
   cursor: pointer;
   font-weight: 700;
+  font-size: 13px;
+  transition: background-color 0.15s ease;
+}
+
+.ciwa-save-btn:hover {
+  background: var(--cdl-brand-700, #0f766e);
 }

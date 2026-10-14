@@ -101,7 +101,8 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
     hideChargeNurseStrip: prioritizeAwareness,
     collapseQueueIntelligence: prioritizeAwareness,
     maxVisibleCards:
-      prioritizeAwareness && waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated
+      (prioritizeAwareness && waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingElevated) ||
+      totalPatients > WHITEBOARD_CARD_PREVIEW_LIMIT
         ? WHITEBOARD_CARD_PREVIEW_LIMIT
         : null,
     suggestedFilter:

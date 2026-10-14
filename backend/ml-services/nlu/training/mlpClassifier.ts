@@ -102,7 +102,14 @@ export function trainMlpClassifier(
   numClasses: number,
   labelToIntent: Record<number, string>,
   embeddingModelName: string,
-  config: { numEpochs: number; learningRate: number; l2Reg: number; hiddenDim: number; seed: number; patience?: number },
+  config: {
+    numEpochs: number;
+    learningRate: number;
+    l2Reg: number;
+    hiddenDim: number;
+    seed: number;
+    patience?: number;
+  },
   validation?: { embeddings: number[][]; labels: number[] },
   classWeights?: number[],
 ): MlpTrainResult {
@@ -233,7 +240,14 @@ export function trainMlpClassifier(
 
     let currentValLoss: number | null = null;
     if (hasVal) {
-      currentValLoss = meanCrossEntropyLoss(w1, b1, w2, b2, validation!.embeddings, validation!.labels);
+      currentValLoss = meanCrossEntropyLoss(
+        w1,
+        b1,
+        w2,
+        b2,
+        validation!.embeddings,
+        validation!.labels,
+      );
       if (currentValLoss < (bestValLoss as number)) {
         bestValLoss = currentValLoss;
         bestEpoch = epoch;
@@ -248,7 +262,9 @@ export function trainMlpClassifier(
       const elapsedSec = ((Date.now() - trainStart) / 1000).toFixed(1);
       const trainLoss = epochLosses[epoch];
       const valLossMsg = currentValLoss !== null ? `, valLoss=${currentValLoss.toFixed(4)}` : '';
-      console.log(`  epoch ${epoch + 1}/${config.numEpochs} (${elapsedSec}s): trainLoss=${trainLoss.toFixed(4)}${valLossMsg}`);
+      console.log(
+        `  epoch ${epoch + 1}/${config.numEpochs} (${elapsedSec}s): trainLoss=${trainLoss.toFixed(4)}${valLossMsg}`,
+      );
     }
 
     // The returned weights are already the best-val-loss checkpoint (below), so epochs
@@ -265,7 +281,9 @@ export function trainMlpClassifier(
   }
 
   if (hasVal) {
-    console.log(`  MLP checkpoint: best epoch=${bestEpoch + 1}, best valLoss=${(bestValLoss as number).toFixed(4)}`);
+    console.log(
+      `  MLP checkpoint: best epoch=${bestEpoch + 1}, best valLoss=${(bestValLoss as number).toFixed(4)}`,
+    );
   }
 
   const finalW1 = hasVal ? bestW1 : w1;

@@ -24,7 +24,7 @@
   margin: 0;
   font-size: 13px;
   font-weight: 800;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -95,7 +95,7 @@
 }
 
 .queue-operational-panel__item span {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, #64748b);
 }
 
 .queue-operational-panel__item--bottleneck {

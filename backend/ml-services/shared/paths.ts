@@ -35,7 +35,13 @@ export function resolveClassifierPath(head: ClassifierHead): string {
   if (existsSync(unified)) return unified;
 
   const legacyService = head === 'nlu' ? 'nlu' : 'artifact-router';
-  const legacy = path.join(ML_SERVICES_ROOT, legacyService, 'models', 'best_model', 'classifier.json');
+  const legacy = path.join(
+    ML_SERVICES_ROOT,
+    legacyService,
+    'models',
+    'best_model',
+    'classifier.json',
+  );
   if (existsSync(legacy)) return legacy;
 
   return unified;

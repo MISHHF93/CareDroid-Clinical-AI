@@ -19,7 +19,7 @@
   margin: 0;
   font-size: 13px;
   font-weight: 800;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -77,7 +77,7 @@
 .data-quality-risk-panel__item p {
   margin: 0;
   font-size: 12px;
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, #64748b);
   line-height: 1.45;
 }
 
@@ -101,7 +101,7 @@
 .data-quality-risk-panel__empty {
   margin: 0;
   font-size: 12px;
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, #64748b);
 }
 
 .data-quality-risk-panel--compact {

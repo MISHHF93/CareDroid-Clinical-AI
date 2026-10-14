@@ -105,9 +105,9 @@
 
   /* ── Control / icon optical sizes ── */
   --cdl-touch-min: 44px;
-  --cdl-control-height-sm: 34px;
-  --cdl-control-height-md: 40px;
-  --cdl-control-height-lg: 44px;
+  --cdl-control-height-sm: 28px;
+  --cdl-control-height-md: 32px;
+  --cdl-control-height-lg: 36px;
   --cdl-icon-xs: 12px;
   --cdl-icon-sm: 16px;
   --cdl-icon-md: 20px;

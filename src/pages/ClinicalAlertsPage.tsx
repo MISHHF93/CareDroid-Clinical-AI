@@ -63,6 +63,8 @@ const ClinicalAlertsPage = () => {
   const canExport = can(CAREDROID_PERMISSIONS.REPORTS_EXPORT);
   const [selectedSeverity, setSelectedSeverity] = useState<AlertSeverity | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ALERTS_PER_PAGE = 10;
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
   const [apiNotice, setApiNotice] = useState('');
   const knowledgeGraph = useUnifiedApplicationKnowledgeGraph();
@@ -96,7 +98,8 @@ const ClinicalAlertsPage = () => {
       // summary, or a failure the user has nothing else to see for.
       const syncFailed = result.ingested === 0 && result.skipped === 0;
       const hasVisibleAlerts = useEmergencyStore.getState().alerts.length > 0;
-      setApiNotice(syncFailed && hasVisibleAlerts ? '' : result.message);
+      const isRoutineNoOp = result.ingested === 0 && hasVisibleAlerts;
+      setApiNotice((syncFailed && hasVisibleAlerts) || isRoutineNoOp ? '' : result.message);
       setIsLoadingAlerts(false);
     }
 
@@ -130,6 +133,13 @@ const ClinicalAlertsPage = () => {
     }
     return filtered;
   }, [displayAlerts, searchTerm, selectedSeverity]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAlerts.length / ALERTS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedAlerts = useMemo(() => {
+    const start = (safeCurrentPage - 1) * ALERTS_PER_PAGE;
+    return filteredAlerts.slice(start, start + ALERTS_PER_PAGE);
+  }, [filteredAlerts, safeCurrentPage]);
 
   const handleAcknowledge = async (alertId: string) => {
     // onClick invokes this fire-and-forget (no await at the call site), so a
@@ -277,7 +287,10 @@ const ClinicalAlertsPage = () => {
                 className="alerts-controls__search-input"
                 placeholder="Search by title, description, or source…"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 aria-label="Search clinical alerts"
               />
             </div>
@@ -298,7 +311,10 @@ const ClinicalAlertsPage = () => {
                   ]
                     .filter(Boolean)
                     .join(' ')}
-                  onClick={() => setSelectedSeverity(f.value as AlertSeverity | 'all')}
+                  onClick={() => {
+                    setSelectedSeverity(f.value as AlertSeverity | 'all');
+                    setCurrentPage(1);
+                  }}
                   {...(selectedSeverity === f.value
                     ? { 'aria-pressed': 'true' as const }
                     : { 'aria-pressed': 'false' as const })}
@@ -318,11 +334,23 @@ const ClinicalAlertsPage = () => {
           <div className="alerts-list-section">
             {!isLoadingAlerts && filteredAlerts.length > 0 ? (
               <>
-                <p className="alerts-list-label">
-                  {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''}
-                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <p className="alerts-list-label" style={{ margin: 0 }}>
+                    Showing{' '}
+                    {filteredAlerts.length === 0 ? 0 : (safeCurrentPage - 1) * ALERTS_PER_PAGE + 1}–
+                    {Math.min(safeCurrentPage * ALERTS_PER_PAGE, filteredAlerts.length)} of{' '}
+                    {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
                 <ul className="alerts-list">
-                  {filteredAlerts.map((alert) => (
+                  {paginatedAlerts.map((alert) => (
                     <li key={alert.id}>
                       <article
                         className={[
@@ -530,6 +558,36 @@ const ClinicalAlertsPage = () => {
                     </li>
                   ))}
                 </ul>
+                {totalPages > 1 && (
+                  <nav className="alerts-pagination" aria-label="Alerts pagination">
+                    <div className="alerts-pagination__info">
+                      Page {safeCurrentPage} of {totalPages}
+                    </div>
+                    <div className="alerts-pagination__actions">
+                      <button
+                        type="button"
+                        className="alerts-pagination__btn"
+                        disabled={safeCurrentPage <= 1}
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        aria-label="Previous page of alerts"
+                      >
+                        Previous
+                      </button>
+                      <span className="alerts-pagination__pages" aria-current="page">
+                        {safeCurrentPage} / {totalPages}
+                      </span>
+                      <button
+                        type="button"
+                        className="alerts-pagination__btn"
+                        disabled={safeCurrentPage >= totalPages}
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        aria-label="Next page of alerts"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </nav>
+                )}
               </>
             ) : !isLoadingAlerts ? (
               <div className="alerts-empty-state" role="status">

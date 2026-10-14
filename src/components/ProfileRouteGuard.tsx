@@ -25,6 +25,9 @@ const PROFILE_ROUTE_EXEMPT_PREFIXES = Object.freeze([
   // PERMISSION_ROUTE_MAP because canAccessRoute matches by prefix, so a bucket
   // entry would also hand out anything nested beneath it.
   '/two-factor-setup',
+  // Emergency self-arrival is a public/patient kiosk check-in surface; it is
+  // open to walk-in patients and any authenticated staff testing kiosk mode.
+  '/emergency/self-arrival',
 ]);
 
 function isExemptProfileRoute(pathname) {

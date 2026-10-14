@@ -991,16 +991,88 @@ export function CapacityRoute() {
             ]}
           />
           {capacityStatus.data?.data?.recommendations?.length ? (
-            <div className="emergency-route-stack">
+            <div
+              className="emergency-route-recommendations-grid"
+              role="region"
+              aria-label="Capacity operational recommendations"
+            >
               {capacityStatus.data.data.recommendations.map((recommendation) => (
-                <div
-                  key={recommendation}
-                  className="emergency-route-card emergency-route-recommendation"
-                >
-                  {recommendation}
+                <div key={recommendation} className="emergency-route-recommendation-card">
+                  <span className="emergency-route-recommendation-dot" aria-hidden="true" />
+                  <span>{recommendation}</span>
                 </div>
               ))}
             </div>
+          ) : null}
+          {rooms.length > 0 ? (
+            <section
+              className="emergency-route-rooms-section"
+              aria-label="Treatment spaces and bed capacity"
+            >
+              <div className="emergency-route-rooms-header">
+                <h3 className="emergency-route-rooms-title">
+                  Treatment Spaces & Bays ({rooms.length})
+                </h3>
+                <div className="emergency-route-rooms-badges">
+                  <span className="emergency-route-rooms-badge emergency-route-rooms-badge--available">
+                    {availableRooms} Available
+                  </span>
+                  <span className="emergency-route-rooms-badge emergency-route-rooms-badge--occupied">
+                    {capacity.occupiedRooms ?? rooms.length - availableRooms - blockedRooms}{' '}
+                    Occupied
+                  </span>
+                  {blockedRooms > 0 ? (
+                    <span className="emergency-route-rooms-badge emergency-route-rooms-badge--blocked">
+                      {blockedRooms} Blocked
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+              <div className="emergency-route-rooms-grid">
+                {rooms.map((room) => {
+                  const assignedPatient = patients.find(
+                    (p) => p.id === (room.currentPatientId || room.patientId),
+                  );
+                  return (
+                    <div
+                      key={room.id}
+                      className={`emergency-route-room-card emergency-route-room-card--${room.status.toLowerCase()}`}
+                    >
+                      <div className="emergency-route-room-card__header">
+                        <span className="emergency-route-room-card__name">{room.name}</span>
+                        <span
+                          className={`emergency-route-room-card__status emergency-route-room-card__status--${room.status.toLowerCase()}`}
+                        >
+                          {room.status}
+                        </span>
+                      </div>
+                      <div className="emergency-route-room-card__type">{room.type}</div>
+                      <div className="emergency-route-room-card__patient">
+                        {assignedPatient ? (
+                          <>
+                            <span
+                              className="emergency-route-room-card__patient-dot"
+                              aria-hidden="true"
+                            />
+                            <span className="emergency-route-room-card__patient-name">
+                              {displayPatientName(assignedPatient)}
+                            </span>
+                          </>
+                        ) : room.status === 'Blocked' ? (
+                          <span className="emergency-route-room-card__subtext">
+                            Sanitization / Maintenance
+                          </span>
+                        ) : (
+                          <span className="emergency-route-room-card__subtext">
+                            Ready for patient placement
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           ) : null}
           {surfaces.emergencyRoutes.showCapacityUpgradeHarness &&
           (simulationSignal || bragSignal) ? (

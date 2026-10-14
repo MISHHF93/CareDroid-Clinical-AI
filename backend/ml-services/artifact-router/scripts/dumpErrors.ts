@@ -47,7 +47,9 @@ async function dumpErrors(): Promise<void> {
   const out = path.join(path.dirname(MODEL_PATHS.validationData), 'error_report.json');
   writeFileSync(out, JSON.stringify(wrong, null, 2));
   console.log(`Wrote ${wrong.length} errors to ${out}`);
-  wrong.forEach((w) => console.log(`${w.expected} -> ${w.predicted} | ${w.labelType} | ${w.inputText}`));
+  wrong.forEach((w) =>
+    console.log(`${w.expected} -> ${w.predicted} | ${w.labelType} | ${w.inputText}`),
+  );
 }
 
 if (require.main === module) {

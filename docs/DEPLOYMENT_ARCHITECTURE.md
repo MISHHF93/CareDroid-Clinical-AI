@@ -1,49 +1,71 @@
 # CareDroid — Deployment & Infrastructure Architecture
 
-**Document Version:** 2.2.0  
+**Document Version:** 3.0.0  
 **Status:** Living Infrastructure Specification  
-**Lead Authors:** DevSecOps Lead, Principal Systems Engineer  
-**Platforms:** Kubernetes / Docker / AWS / Azure / On-Premise Enclave  
+**Lead Authors:** DevSecOps Lead, Principal Systems Engineer, Cloud Infrastructure Architect  
+**Platforms:** Kubernetes (EKS / AKS / OpenShift), Docker, AWS Canada Central, Azure Canada Central, On-Premise Air-Gapped LAN  
+**Classification:** Enterprise Healthcare Architecture & Due Diligence Authority  
 
 ---
 
-## 1. Multi-Enclave Deployment Architecture
+## 1. Multi-Enclave Deployment Topologies
 
-CareDroid supports three deployment topologies to accommodate strict hospital health-data regulations:
-1. **Hospital On-Premise Air-Gapped Enclave:** Runs inside the hospital physical datacenter with zero external internet dependencies; utilizes local models and offline caching.
-2. **Dedicated Cloud Enclave (AWS Canada / Azure Canada Central):** Single-tenant, isolated VPC meeting Canadian PIPEDA and provincial residency requirements.
-3. **Hybrid Edge-Cloud:** Central multi-tenant analytics cloud with local micro-gateways running at each hospital facility for low-latency bedside telemetry.
+To accommodate the stringent data residency, privacy regulations, and operational continuity mandates of acute healthcare networks, CareDroid supports three distinct deployment topologies:
 
 ```mermaid
 flowchart TD
-    subgraph HospitalLAN["Hospital Private Clinical Network"]
-        Clients["Clinical Workstations & Tablets"]
-        Monitors["Bedside Biometric Monitors"]
-        EdgeNode["CareDroid Local Edge Node (Docker/K8s)"]
+    subgraph Topology1["1. On-Premise Air-Gapped Enclave (Zero Internet Egress)"]
+        LANWorkstations["Hospital Bedside Tablets & Desktops"] --> LocalK8s["On-Premise Kubernetes Cluster\n(OpenShift / k3s)"]
+        LocalK8s --> LocalPG[("Local PostgreSQL HA (Patroni)")]
+        LocalK8s --> LocalModel["Quantized Local Inference (vLLM / ONNX)"]
     end
 
-    subgraph CoreCloud["CareDroid Dedicated Cloud Enclave (Canada)"]
-        Ingress["mTLS Ingress / Cloudflare Magic Transit"]
-        AppNodes["NestJS Application Cluster (Autoscaling)"]
-        Postgres[(Managed PostgreSQL Multi-AZ)]
-        Redis[(Redis HA Cluster)]
+    subgraph Topology2["2. Dedicated Canadian Cloud Enclave (AWS / Azure Canada)"]
+        CloudClient["Secure VPN / DirectConnect"] --> WAF["Cloudflare WAF / Magic Transit"]
+        WAF --> EKSCluster["Dedicated AWS EKS Cluster (Canada Central)"]
+        EKSCluster --> AuroraPG[("Amazon Aurora PostgreSQL Multi-AZ")]
+        EKSCluster --> ElastiCache[("Redis HA Cluster")]
     end
 
-    Clients --> EdgeNode
-    Monitors --> EdgeNode
-    EdgeNode <-->|Encrypted WireGuard VPN| Ingress
-    Ingress --> AppNodes
-    AppNodes --> Postgres
-    AppNodes --> Redis
+    subgraph Topology3["3. Hybrid Edge-Cloud Architecture"]
+        BedsideEdge["Bedside Telemetry Monitors"] --> EdgeGateway["Clinical Edge Gateway (Hospital Pod)"]
+        EdgeGateway -->|500Hz Local Processing| LocalAlerts["Bedside Alerts (<50ms)"]
+        EdgeGateway -->|1Hz Downsampled mTLS VPN| CloudCentral["CareDroid Central Cloud Analytics"]
+    end
 ```
 
 ---
 
-## 2. Infrastructure as Code & Environment Variables
+## 2. Infrastructure as Code & Container Topologies
 
-- **Environment Separation:** `development`, `staging`, `production`.
-- **Secret Zero Policy:** No production passwords, private keys, or API tokens exist in repositories or build images. Secrets are dynamically injected via HashiCorp Vault or AWS Secrets Manager at pod startup.
-- **Health Probing:** Liveness probe `/api/health/live` (checks basic process responsiveness) and Readiness probe `/api/health/ready` (validates database connection pool and Redis reachability).
+### 2.1 Container Specifications & Pod Topologies
+- **Base Images:** Built on minimal, distroless hardened container images (`cgr.dev/chainguard/node:latest`) with non-root runtime users (`UID: 10001`).
+- **Pod Replicas & Autoscaling:**
+  - `caredroid-backend`: Horizontal Pod Autoscaler (HPA) configured for 3 to 20 replicas based on CPU (>70%) and WebSocket connection count (>1,000 sockets/pod).
+  - `caredroid-frontend`: Static edge delivery via CDN or NGINX container cluster.
+- **Resource Allocations:**
+  - Backend API Pod: Requests `500m CPU / 1Gi RAM`; Limits `2000m CPU / 4Gi RAM`.
+
+### 2.2 Health Probing & Liveness Checks
+- **Liveness Probe (`GET /api/health/live`):** Checks process event loop responsiveness; fails if event loop lag exceeds 500ms.
+- **Readiness Probe (`GET /api/health/ready`):** Validates database connection pool health, Redis cluster reachability, and active WebSocket listener status.
 
 ---
 
+## 3. Secret Zero Policy & Configuration Management
+
+1. **Zero Hardcoded Credentials:** Repositories, Dockerfiles, and container images contain zero passwords, API tokens, or encryption keys.
+2. **Dynamic Secret Injection:** At pod initialization, secrets are fetched dynamically via Kubernetes External Secrets Operator linked to HashiCorp Vault or AWS Secrets Manager.
+3. **Environment Segregation:** Complete physical and logical isolation between `development`, `staging`, and `production` environments.
+
+---
+
+## 4. Disaster Recovery & Multi-AZ Failover
+
+- **Multi-AZ Replication:** PostgreSQL utilizes synchronous streaming replication across two availability zones with an asynchronous cross-region replica in AWS Canada West (Calgary) for catastrophic disaster recovery.
+- **Recovery Point Objective (RPO):** < 1 minute for local AZ failure; < 15 minutes for regional catastrophe.
+- **Recovery Time Objective (RTO):** < 15 minutes automated DNS failover via Route 53 health checks.
+
+---
+
+*This deployment specification defines the infrastructure standards and operational hosting requirements for CareDroid.*

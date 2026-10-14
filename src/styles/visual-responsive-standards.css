@@ -22,7 +22,7 @@
   --app-visual-header-padding: 18px;
   --app-visual-card-padding: 16px;
   --app-visual-control-gap: 8px;
-  --app-visual-control-height: 36px;
+  --app-visual-control-height: 32px;
   --app-visual-grid-min: minmax(min(100%, 260px), 1fr);
   --app-visual-grid-min-compact: minmax(min(100%, 220px), 1fr);
 
@@ -50,9 +50,9 @@
   --compact-card-padding: var(--app-visual-card-padding);
   --compact-panel-padding: var(--app-visual-header-padding);
   --compact-control-height: 32px;
-  --app-button-height: 36px;
-  --app-input-height: 36px;
-  --component-button-height: 36px;
+  --app-button-height: 32px;
+  --app-input-height: 32px;
+  --component-button-height: 32px;
   --type-body-line-height: var(--app-readable-line-height);
   --type-small-line-height: 1.45;
   --type-heading-line-height: var(--app-readable-heading-line-height);
@@ -262,6 +262,10 @@
     .summary-grid
   ) {
   grid-template-columns: repeat(auto-fit, var(--app-visual-grid-min));
+}
+
+:is(.app-shell, .emergency-app-shell) .emergency-route-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
 }
 
 :is(.app-shell, .emergency-app-shell)

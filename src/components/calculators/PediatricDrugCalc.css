@@ -54,13 +54,14 @@
 }
 
 .pdc-estimate-btn {
-  border: 1px solid #0ea5e9;
-  border-radius: 10px;
-  background: #0ea5e9;
-  color: var(--medical-ink, #111827);
+  border: 1px solid var(--cdl-brand-700, #0f766e);
+  border-radius: var(--cdl-radius-md, 6px);
+  background: var(--cdl-brand-600, #0f766e);
+  color: #ffffff;
   cursor: pointer;
   font-weight: 700;
-  padding: 12px 14px;
+  padding: 6px 14px;
+  min-height: 32px;
   white-space: nowrap;
 }
 
@@ -75,7 +76,7 @@
 }
 
 .pdc-estimate-note {
-  color: #0ea5e9;
+  color: var(--cdl-brand-700, #0f766e);
   font-size: 12px;
 }
 

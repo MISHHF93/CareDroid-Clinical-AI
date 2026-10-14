@@ -317,8 +317,15 @@
   border-radius: var(--app-visual-control-radius);
   background: var(--app-input-bg);
   color: var(--app-text-primary);
-  font-size: max(var(--text-input-min), var(--app-type-small));
+  font-size: var(--app-type-small, 13px);
   line-height: var(--type-body-line-height);
+}
+
+@media (max-width: 768px) {
+  :is(.app-shell, .emergency-app-shell)
+    :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    font-size: max(var(--text-input-min, 16px), 14px);
+  }
 }
 
 :is(.app-shell, .emergency-app-shell)

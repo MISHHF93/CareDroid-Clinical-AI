@@ -1,25 +1,29 @@
 .response-compliance-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  box-sizing: border-box;
   gap: 4px;
   padding: 14px 16px;
   border-radius: 8px;
   border: 1.5px solid transparent;
-  background: var(--medical-surface-page, #f1f5f9);
+  background: var(--medical-surface-card, var(--app-surface-1, #f1f5f9));
 }
 
 .response-compliance-card--green {
-  background: color-mix(in srgb, #22c55e 8%, var(--app-surface-1, #fff));
-  border-color: color-mix(in srgb, #22c55e 25%, transparent);
+  background: color-mix(in srgb, var(--app-success, #22c55e) 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, var(--app-success, #22c55e) 25%, transparent);
 }
 
 .response-compliance-card--amber {
-  background: color-mix(in srgb, #f59e0b 8%, var(--app-surface-1, #fff));
-  border-color: color-mix(in srgb, #f59e0b 25%, transparent);
+  background: color-mix(in srgb, var(--app-warning, #f59e0b) 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, var(--app-warning, #f59e0b) 25%, transparent);
 }
 
 .response-compliance-card--red {
-  background: color-mix(in srgb, #ef4444 8%, var(--app-surface-1, #fff));
-  border-color: color-mix(in srgb, #ef4444 25%, transparent);
+  background: color-mix(in srgb, var(--app-danger, #ef4444) 8%, var(--app-surface-1, #fff));
+  border-color: color-mix(in srgb, var(--app-danger, #ef4444) 25%, transparent);
 }
 
 .response-compliance-card__head {
@@ -34,7 +38,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .response-compliance-card__rag {
@@ -45,16 +49,16 @@
 }
 
 .response-compliance-card__rag--green {
-  background: #dcfce7;
-  color: #15803d;
+  background: color-mix(in srgb, var(--app-success, #22c55e) 15%, transparent);
+  color: var(--app-success, #15803d);
 }
 .response-compliance-card__rag--amber {
-  background: #fef3c7;
-  color: #b45309;
+  background: color-mix(in srgb, var(--app-warning, #f59e0b) 15%, transparent);
+  color: var(--app-warning, #b45309);
 }
 .response-compliance-card__rag--red {
-  background: #fee2e2;
-  color: #dc2626;
+  background: color-mix(in srgb, var(--app-danger, #ef4444) 15%, transparent);
+  color: var(--app-danger, #dc2626);
 }
 
 .response-compliance-card__rate {
@@ -62,22 +66,43 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1;
-  color: var(--medical-text-heading, #111827);
+  color: var(--medical-text-heading, var(--app-fg, #111827));
+  font-variant-numeric: tabular-nums;
 }
 
 .response-compliance-card__detail {
-  margin: 0;
+  margin: auto 0 0;
+  padding-top: 4px;
   font-size: 13px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .response-compliance-card__pending {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #dc2626;
+  color: var(--app-danger, #dc2626);
   padding: 4px 8px;
-  background: #fee2e2;
+  background: color-mix(in srgb, var(--app-danger, #ef4444) 12%, transparent);
   border-radius: 4px;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+html[data-theme='dark'] .response-compliance-card {
+  background: var(--app-surface-1);
+}
+
+html[data-theme='dark'] .response-compliance-card--green {
+  background: color-mix(in srgb, var(--app-success) 12%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--app-success) 35%, transparent);
+}
+
+html[data-theme='dark'] .response-compliance-card--amber {
+  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--app-warning) 35%, transparent);
+}
+
+html[data-theme='dark'] .response-compliance-card--red {
+  background: color-mix(in srgb, var(--app-danger) 12%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--app-danger) 35%, transparent);
 }

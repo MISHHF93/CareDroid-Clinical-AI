@@ -1319,7 +1319,10 @@ function AppShellFrame({ children }: AppShellProps) {
     setShowPalette(false);
   };
 
-  const isReceptionSimpleDensity = screenDensityProfile.id === 'simple-fast';
+  const isReceptionSimpleDensity =
+    screenDensityProfile.id === 'simple-fast' ||
+    location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception) ||
+    location.pathname === '/reception';
 
   return (
     <div

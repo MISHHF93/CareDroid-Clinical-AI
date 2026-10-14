@@ -101,11 +101,14 @@ export interface PreparedDataset {
 }
 
 /** Port of train.py's prepare_dataset(): use dedicated val/test files if present, else split off from train. */
-export function prepareDataset(paths: {
-  trainingData: string;
-  validationData: string;
-  testData: string;
-}, seed: number): PreparedDataset {
+export function prepareDataset(
+  paths: {
+    trainingData: string;
+    validationData: string;
+    testData: string;
+  },
+  seed: number,
+): PreparedDataset {
   const trainData = loadJsonlDataset(paths.trainingData);
   const dedicatedVal = loadJsonlDataset(paths.validationData);
   const dedicatedTest = loadJsonlDataset(paths.testData);

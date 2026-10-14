@@ -1,29 +1,29 @@
 .provisional-identity-panel {
   display: grid;
-  gap: 8px;
-  padding: 10px;
+  gap: 6px;
+  padding: 6px 10px;
   border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 10px;
-  background: rgba(37, 99, 235, 0.07);
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.05);
 }
 
 .provisional-identity-panel header {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: baseline;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .provisional-identity-panel header h3 {
   margin: 0;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .provisional-identity-panel header p {
   margin: 0;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 11px;
 }
 
@@ -34,17 +34,19 @@
 }
 
 .provisional-identity-panel__option {
-  display: grid;
-  gap: 3px;
-  padding: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 8px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
   transition: all 100ms ease;
+  min-height: 38px;
 }
 
 .provisional-identity-panel__option:hover:not(:disabled) {
@@ -72,7 +74,7 @@
 }
 
 .provisional-identity-panel__option span {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 10px;
   line-height: 1.35;
 }
@@ -84,7 +86,7 @@
   min-width: 16px;
   height: 16px;
   border-radius: 3px;
-  background: var(--color-text-secondary, #9ca3af);
+  background: var(--color-text-secondary, #64748b);
   color: #fff;
   font-size: 8px;
   font-weight: 800;
@@ -92,11 +94,12 @@
 }
 
 .provisional-identity-panel--compact .provisional-identity-panel__options {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media (max-width: 900px) {
-  .provisional-identity-panel__options {
+  .provisional-identity-panel__options,
+  .provisional-identity-panel--compact .provisional-identity-panel__options {
     grid-template-columns: 1fr;
   }
 }

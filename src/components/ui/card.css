@@ -1,5 +1,6 @@
 /* CareDroid card primitive */
 .card {
+  box-sizing: border-box;
   min-width: 0;
   max-width: 100%;
   background: var(--cdl-surface-card, var(--app-surface));

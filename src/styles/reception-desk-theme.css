@@ -6,8 +6,8 @@
 .reception-front-door,
 .reception-workspace,
 .reception-page-layout {
-  --reception-accent: var(--cdl-brand-600, #0284c7);
-  --reception-accent-soft: var(--cdl-info-bg, #f0f9ff);
+  --reception-accent: var(--cdl-brand-600, #0f766e);
+  --reception-accent-soft: var(--cdl-brand-50, #f0fdfa);
   --reception-surface-page: var(--cdl-surface-page, #f8fafc);
   --reception-surface-card: var(--cdl-surface-card, #ffffff);
   --reception-surface-inset: var(--cdl-surface-muted, #f1f5f9);
@@ -71,12 +71,16 @@ html[data-theme='dark'] .reception-workspace .reception-command-panel {
 
 /* Default buttons — muted surface, not chalk white */
 .reception-front-door
-  button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(
-    .unified-intake-actionbar__primary
+  button:not([class*='ghost']):not([class*='link']):not([class*='reception-header']):not(
+    [class*='unified-intake']
+  ):not([class*='reception-quick']):not([class*='reception-command-segmented']):not(
+    [class*='reception-queue-row']
   ):not(.reception-prepare__option--primary),
 .reception-workspace
-  button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(
-    .unified-intake-actionbar__primary
+  button:not([class*='ghost']):not([class*='link']):not([class*='reception-header']):not(
+    [class*='unified-intake']
+  ):not([class*='reception-quick']):not([class*='reception-command-segmented']):not(
+    [class*='reception-queue-row']
   ) {
   background: var(--reception-surface-inset);
   border: 1px solid var(--reception-border);
@@ -116,8 +120,8 @@ html[data-theme='dark'] .reception-workspace .reception-command-panel {
 .reception-front-door .reception-prepare__option--primary,
 .reception-workspace .reception-header__action-btn--primary,
 .reception-workspace .unified-intake-actionbar__primary {
-  background: var(--cdl-brand-700, #0369a1) !important;
-  border-color: var(--cdl-brand-700, #0369a1) !important;
+  background: var(--cdl-brand-700, #0f766e) !important;
+  border-color: var(--cdl-brand-700, #0f766e) !important;
   color: var(--cdl-on-brand, #ffffff) !important;
   font-weight: 800;
 }
@@ -126,8 +130,8 @@ html[data-theme='dark'] .reception-workspace .reception-command-panel {
 .reception-front-door .unified-intake-actionbar__primary:hover,
 .reception-workspace .reception-header__action-btn--primary:hover {
   filter: brightness(1.05);
-  background: var(--cdl-brand-600, #0284c7) !important;
-  border-color: var(--cdl-brand-600, #0284c7) !important;
+  background: var(--cdl-brand-600, #0d9488) !important;
+  border-color: var(--cdl-brand-600, #0d9488) !important;
 }
 
 /* Form controls */
@@ -162,7 +166,7 @@ html[data-theme='dark'] .reception-workspace textarea {
 .reception-workspace textarea:focus-visible {
   outline: none;
   box-shadow: var(--reception-focus);
-  border-color: var(--cdl-brand-500, #0ea5e9);
+  border-color: var(--cdl-brand-500, #0d9488);
 }
 
 .reception-front-door ::placeholder,

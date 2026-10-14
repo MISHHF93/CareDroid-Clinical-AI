@@ -66,7 +66,7 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.copilot.compactLayout).toBe(true);
     expect(surfaces.copilot.showSafetyBadge).toBe(false);
     expect(surfaces.emergencyRoutes.showDescriptions).toBe(false);
-    expect(surfaces.emergencyRoutes.showMetricCards).toBe(false);
+    expect(surfaces.emergencyRoutes.showMetricCards).toBe(true);
     expect(surfaces.emergencyRoutes.showCrossLinks).toBe(false);
     expect(surfaces.emergencyRoutes.showCapacityUpgradeHarness).toBe(false);
     expect(surfaces.ems.showOffloadTrackerPanel).toBe(false);

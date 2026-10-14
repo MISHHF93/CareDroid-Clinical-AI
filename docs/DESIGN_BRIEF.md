@@ -68,7 +68,7 @@ The CareDroid color system is built on a dual-mode foundation (calibrated for bo
 
 ---
 
-## 3.2 Typography System
+### 3.2 Typography System
 
 CareDroid uses an ultra-clean, modern geometric sans-serif stack optimized for high-speed legibility across varied viewing distances:
 
@@ -89,7 +89,7 @@ CareDroid uses an ultra-clean, modern geometric sans-serif stack optimized for h
 
 ---
 
-## 3.3 Elevation, Depth & Geometry
+### 3.3 Elevation, Depth & Geometry
 
 To avoid visual fatigue, CareDroid rejects deep, muddy drop shadows in favor of crisp, multi-layered ambient occlusion:
 
@@ -136,18 +136,20 @@ The CareDroid application shell consists of 5 tightly coordinated spatial zones:
 
 ### 4.1 Navigation Rail (Sidebar)
 - Follows the active theme (pure white in light mode, deep black `#000000` in dark mode) to create crisp visual grounding.
-- 252px width expanded, 64px width collapsed.
+- 240px width expanded, 56px width collapsed icon rail.
 - Active route highlighted by brand mint/teal left anchor bar with subtle inset glowing background (`rgba(94, 234, 212, 0.13)`).
 - Critical notification count badges (e.g., Unassigned Inbound EMS or Sepsis Flags) highlight in high-contrast red/amber.
 
 ### 4.2 Top Utility Bar
-- 60px height with translucent frosted glass backdrop (`backdrop-filter: blur(14px)`).
+- 52px compact clinical height (`--cdl-header-height: 52px`) with translucent frosted glass backdrop (`backdrop-filter: blur(14px)`).
 - Centered or left-aligned real-time department synchronizer pulse (Green pulse = <2s sync latency; Amber = stale sync; Red = disconnected offline mode).
+- Action buttons, lookup inputs, and search bars adhere strictly to `--cdl-control-height-md: 32px`.
 - Universal Omnibox / Search with instant keyboard trigger (`⌘K` / `Ctrl+K`), searching across Patients, Encounters, Inbound EMS, and Clinical Calculators.
 
 ### 4.3 Route Identity Band
-- Dedicated 72px workspace header that establishes clear context for the practitioner.
+- Dedicated 48px workspace header (`--cdl-route-tab-height: 48px`) that establishes clear context for the practitioner.
 - Houses workspace title (`<h1>`), contextual subtitle, and up to 3 high-priority contextual action buttons (e.g. `+ New Arrival`, `Reassess All Due`, `Export Shift Report`).
+- Chrome stack height strictly budgeted: `calc(var(--cdl-header-height) + var(--cdl-route-tab-height))` = 100px total top chrome.
 
 ---
 

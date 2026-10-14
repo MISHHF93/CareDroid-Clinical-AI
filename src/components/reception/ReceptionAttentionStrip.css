@@ -11,14 +11,21 @@
 }
 
 .reception-attention--empty {
-  padding: 8px 12px;
+  padding: 4px 10px;
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-left: 3px solid var(--cdl-ok, #059669);
+  border-radius: var(--cdl-radius-md, 6px);
+  background: var(--cdl-surface-card, #ffffff);
 }
 
-.reception-attention__status {
+.reception-attention--empty .reception-attention__status {
   margin: 0;
-  color: var(--cdl-ink-muted, #334155);
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--cdl-ink-muted, #475569);
+  font-size: 11px;
+  font-weight: 650;
 }
 
 .reception-attention__header {

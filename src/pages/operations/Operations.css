@@ -45,7 +45,7 @@
 
 .operations-hub__actions a,
 .operations-hub__actions button {
-  min-height: var(--compact-control-height, 40px);
+  min-height: var(--compact-control-height, 32px);
   padding: 8px 14px;
   border-radius: var(--compact-panel-radius, 12px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));
@@ -61,7 +61,7 @@
 }
 
 .operations-hub__search {
-  min-height: var(--compact-control-height, 40px);
+  min-height: var(--compact-control-height, 32px);
   padding: 8px 12px;
   border-radius: var(--compact-panel-radius, 10px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));

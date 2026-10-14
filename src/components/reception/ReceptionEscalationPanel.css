@@ -50,7 +50,7 @@
 .reception-escalation-panel__header p {
   margin: 6px 0 0;
   font-size: 13px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .reception-escalation-panel__close,
@@ -85,7 +85,7 @@
 .reception-escalation-panel__reasons legend {
   margin-bottom: 8px;
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .reception-escalation-panel__reason {
@@ -113,7 +113,7 @@
 .reception-escalation-panel__reason small {
   display: block;
   margin-top: 4px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
 }
 
@@ -129,7 +129,7 @@
   display: grid;
   gap: 6px;
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .reception-escalation-panel__field select,

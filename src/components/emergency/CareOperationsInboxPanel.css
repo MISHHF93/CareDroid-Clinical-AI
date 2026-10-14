@@ -1,41 +1,39 @@
 .care-ops-inbox {
   border: 1px solid var(--medical-border, #e0f2fe);
-  border-radius: 18px;
+  border-radius: 8px;
   background: var(--app-surface-1, #ffffff);
-  padding: 16px 18px;
+  padding: 4px 12px;
   display: grid;
-  gap: 10px;
+  gap: 4px;
 }
 
 .care-ops-inbox__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .care-ops-inbox__header strong {
   color: var(--medical-ink, #111827);
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .care-ops-inbox__lead {
-  margin: 2px 0 0;
-  color: var(--medical-text-subtle, #6b7280);
-  font-size: 12px;
-  max-width: 640px;
+  display: none;
 }
 
 .care-ops-inbox__badge {
   flex-shrink: 0;
-  min-width: 24px;
+  min-width: 20px;
   text-align: center;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 999px;
   background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
-  font-weight: 700;
-  font-size: 12px;
+  font-weight: 750;
+  font-size: 11px;
 }
 
 .care-ops-inbox__overdue-banner {
@@ -76,22 +74,25 @@
 
 .care-ops-inbox__empty {
   color: var(--medical-text-subtle, #6b7280);
-  font-size: 12px;
+  font-size: 11.5px;
   margin: 0;
 }
 
 .care-ops-inbox__list {
   display: grid;
-  gap: 8px;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .care-ops-inbox__row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid var(--medical-border, #e5e7eb);
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 6px;
+  padding: 4px 10px;
   background: var(--medical-surface-page, #f8fafc);
 }
 
@@ -188,4 +189,31 @@ html[data-theme='dark'] .care-ops-inbox__row {
 
 html[data-theme='dark'] .care-ops-inbox__btn {
   background: var(--app-surface-1, #1e293b);
+}
+
+@media (max-width: 640px) {
+  .care-ops-inbox__row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .care-ops-inbox__row-main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .care-ops-inbox__row-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .care-ops-inbox__status {
+    align-self: flex-start;
+  }
 }

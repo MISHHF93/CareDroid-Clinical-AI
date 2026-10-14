@@ -93,7 +93,7 @@
 
 .waiting-room-safety-escalation-strip__item small {
   display: block;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   margin-top: 2px;
 }
 

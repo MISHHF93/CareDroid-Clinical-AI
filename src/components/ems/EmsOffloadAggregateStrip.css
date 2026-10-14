@@ -3,9 +3,9 @@
      elevation modernization matching the same pattern applied elsewhere
      this session (reception-desk-theme.css, DashboardVisualizations.css). */
   display: grid;
-  gap: 10px;
-  margin: 0 16px 12px;
-  padding: 12px 14px;
+  gap: 6px;
+  margin: 0 16px 6px;
+  padding: 6px 12px;
   border: 1px solid color-mix(in srgb, var(--medical-border, #e0f2fe) 55%, transparent);
   border-radius: var(--cdl-clinical-radius);
   background: var(--app-surface-1, #ffffff);
@@ -23,9 +23,9 @@ html[data-theme='dark'] .ems-offload-aggregate-strip {
 .ems-offload-aggregate-strip__header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ems-offload-aggregate-strip__eyebrow {
@@ -40,15 +40,12 @@ html[data-theme='dark'] .ems-offload-aggregate-strip {
 }
 
 .ems-offload-aggregate-strip__header h3 {
-  margin: 2px 0 0;
-  font-size: 15px;
+  margin: 0;
+  font-size: 13px;
 }
 
 .ems-offload-aggregate-strip__subtitle {
-  margin: 4px 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
-  font-size: 12px;
-  max-width: 52ch;
+  display: none;
 }
 
 .ems-offload-aggregate-strip__open {
@@ -97,7 +94,7 @@ html[data-theme='dark'] .ems-offload-aggregate-strip__count {
 }
 
 .ems-offload-aggregate-strip__count span {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 11px;
 }
 

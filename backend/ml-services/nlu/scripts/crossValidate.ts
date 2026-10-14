@@ -11,7 +11,13 @@ import { loadJsonlDataset, type NluExample } from '../training/dataset';
 import { embedBatch } from '../training/embeddings';
 import { trainClassifier, predictFromAny } from '../training/classifier';
 import { trainMlpClassifier, predictFromMlpEmbedding } from '../training/mlpClassifier';
-import { INTENT_LABELS, LABEL_TO_INTENT, MODEL_CONFIG, MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
+import {
+  INTENT_LABELS,
+  LABEL_TO_INTENT,
+  MODEL_CONFIG,
+  MODEL_PATHS,
+  TRAINING_CONFIG,
+} from '../training/training.config';
 
 function parseFolds(argv: string[]): number {
   const idx = argv.indexOf('--folds');

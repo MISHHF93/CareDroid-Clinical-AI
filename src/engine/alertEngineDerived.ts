@@ -56,7 +56,8 @@ function hasPatientFlag(patient: Patient, flagType: string): boolean {
 function minutesSince(timestamp: string, now: Date): number {
   const parsed = new Date(timestamp).getTime();
   if (!Number.isFinite(parsed)) return 0;
-  return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
+  const rawMinutes = Math.max(0, Math.round((now.getTime() - parsed) / 60000));
+  return Math.min(240, rawMinutes);
 }
 
 function patientName(patient: Patient | undefined): string {

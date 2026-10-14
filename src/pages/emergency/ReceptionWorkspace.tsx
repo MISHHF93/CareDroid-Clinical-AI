@@ -952,7 +952,9 @@ export default function ReceptionWorkspace() {
   const situationTone =
     attention.criticalCount || criticalNeeded
       ? 'critical'
-      : liveRedFlags.length || missingCriticalFields.length || attention.count
+      : liveRedFlags.length ||
+          (draft.chiefComplaint?.trim() && missingCriticalFields.length) ||
+          attention.count
         ? 'warning'
         : 'neutral';
 
@@ -969,8 +971,14 @@ export default function ReceptionWorkspace() {
               },
               {
                 label: 'Draft flags',
-                value: liveRedFlags.length + missingCriticalFields.length,
-                tone: liveRedFlags.length || missingCriticalFields.length ? 'warning' : 'neutral',
+                value:
+                  liveRedFlags.length +
+                  (draft.chiefComplaint?.trim() ? missingCriticalFields.length : 0),
+                tone:
+                  liveRedFlags.length ||
+                  (draft.chiefComplaint?.trim() && missingCriticalFields.length)
+                    ? 'warning'
+                    : 'neutral',
               },
             ]}
             situation={{
@@ -1081,7 +1089,16 @@ export default function ReceptionWorkspace() {
             />
             <EmsCriticalArrivalPrep />
             <ReceptionContentSection>
-              <Stepper draft={draft} aiAssist={aiAssist} result={result} />
+              <div className="reception-intake-preamble">
+                <Stepper draft={draft} aiAssist={aiAssist} result={result} />
+
+                {!clinicalOverride.allowed ? (
+                  <div className="reception-command-guardrail" role="note">
+                    <ShieldCheck size={16} aria-hidden="true" />
+                    <span>{clinicalOverride.reason}</span>
+                  </div>
+                ) : null}
+              </div>
 
               {hasSavedDraft && !String(draft.chiefComplaint || '').trim() && !result ? (
                 <div className="reception-command-missing" role="status">
@@ -1102,56 +1119,54 @@ export default function ReceptionWorkspace() {
                 </div>
               ) : null}
 
-              {!clinicalOverride.allowed ? (
-                <div className="reception-command-guardrail" role="note">
-                  <ShieldCheck size={18} aria-hidden="true" />
-                  <span>{clinicalOverride.reason}</span>
-                </div>
-              ) : null}
-
-              {receptionDesk.canUseRegistrationSkills ? (
+              {receptionDesk.canUseRegistrationSkills &&
+              (nextBestAction.skillId !== 'lookup_before_create' ||
+                !receptionDesk.lookupBeforeCreateDefault) ? (
                 <ReceptionSkillStrip action={nextBestAction} onPrimary={handleSkillCta} />
               ) : null}
 
-              {receptionDesk.lookupBeforeCreateDefault && receptionDesk.canUseRegistrationSkills ? (
-                <ReceptionPatientLookup
-                  patients={patients}
-                  inputRef={lookupInputRef}
-                  disabled={submitting}
-                  onSelectExisting={(patientId) => {
-                    selectPatient(patientId);
-                    setPatientDetailOpen(true);
-                    showActionSuccess(
-                      'Existing chart selected — complete ID or hand off from the task sheet.',
-                    );
-                  }}
-                  onCreateNew={resetForNextPatient}
-                />
-              ) : null}
+              <div className="reception-intake-cockpit">
+                {receptionDesk.lookupBeforeCreateDefault &&
+                receptionDesk.canUseRegistrationSkills ? (
+                  <ReceptionPatientLookup
+                    patients={patients}
+                    inputRef={lookupInputRef}
+                    disabled={submitting}
+                    onSelectExisting={(patientId) => {
+                      selectPatient(patientId);
+                      setPatientDetailOpen(true);
+                      showActionSuccess(
+                        'Existing chart selected — complete ID or hand off from the task sheet.',
+                      );
+                    }}
+                    onCreateNew={resetForNextPatient}
+                  />
+                ) : null}
 
-              <ReceptionCard padding="normal">
-                <UnifiedIntakePanel
-                  draft={draft}
-                  onDraftChange={updateDraft}
-                  aiAssist={aiAssist}
-                  onAiAssistChange={setAiAssist}
-                  result={result}
-                  canCreatePatient={canCreatePatient && receptionDesk.canUseRegistrationSkills}
-                  submitting={submitting}
-                  onSaveDraft={saveDraft}
-                  onRoute={createAndRoute}
-                  onReset={resetForNextPatient}
-                  showQueueRail={false}
-                  actorName={currentUserName}
-                  patientId={selectedPatientId || undefined}
-                  duplicateWarnings={duplicateWarnings}
-                  assistTitle={
-                    receptionDesk.labelAssistAsDeskNotAi
-                      ? 'Desk assist (rules)'
-                      : RECEPTION_COPY.copilot?.title || 'Desk assist'
-                  }
-                />
-              </ReceptionCard>
+                <ReceptionCard padding="compact">
+                  <UnifiedIntakePanel
+                    draft={draft}
+                    onDraftChange={updateDraft}
+                    aiAssist={aiAssist}
+                    onAiAssistChange={setAiAssist}
+                    result={result}
+                    canCreatePatient={canCreatePatient && receptionDesk.canUseRegistrationSkills}
+                    submitting={submitting}
+                    onSaveDraft={saveDraft}
+                    onRoute={createAndRoute}
+                    onReset={resetForNextPatient}
+                    showQueueRail={false}
+                    actorName={currentUserName}
+                    patientId={selectedPatientId || undefined}
+                    duplicateWarnings={duplicateWarnings}
+                    assistTitle={
+                      receptionDesk.labelAssistAsDeskNotAi
+                        ? 'Desk assist (rules)'
+                        : RECEPTION_COPY.copilot?.title || 'Desk assist'
+                    }
+                  />
+                </ReceptionCard>
+              </div>
             </ReceptionContentSection>
 
             {/* Nested escalation strip removed — single attention surface lives in sidebar.
@@ -1191,6 +1206,29 @@ export default function ReceptionWorkspace() {
               isHighRiskPatient={isHighRiskPatient}
               activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
               emptyQueueMessage={emptyQueueMessage}
+              queueTabs={[
+                {
+                  id: 'pretriage',
+                  label: 'Waiting for Nurse',
+                  count: filterQueueByTab(receptionQueueAll, 'pretriage').length,
+                  active: activeQueueTab === 'pretriage',
+                  onClick: () => focusQueueTab('pretriage'),
+                },
+                {
+                  id: 'ems',
+                  label: 'EMS',
+                  count: filterQueueByTab(receptionQueueAll, 'ems').length,
+                  active: activeQueueTab === 'ems',
+                  onClick: () => focusQueueTab('ems'),
+                },
+                {
+                  id: 'verification',
+                  label: 'ID Check',
+                  count: filterQueueByTab(receptionQueueAll, 'verification').length,
+                  active: activeQueueTab === 'verification',
+                  onClick: () => focusQueueTab('verification'),
+                },
+              ]}
             />
             {receptionDesk.showInlineCopilot || assistOpen ? (
               <div className="reception-interactive-ai">

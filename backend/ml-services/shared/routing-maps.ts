@@ -23,9 +23,9 @@ const EXECUTOR_ALIAS: Readonly<Record<string, string>> = {
   'lab-interp': 'lab-interpreter',
   'lab-interpretation': 'lab-interpreter',
   'dose-calc': 'dose-calculator',
-  'differential': 'differential-diagnosis',
-  'protocol': 'protocol-lookup',
-  'guidelines': 'protocol-lookup',
+  differential: 'differential-diagnosis',
+  protocol: 'protocol-lookup',
+  guidelines: 'protocol-lookup',
 };
 
 /** Message patterns → executor when NLU label alone is too coarse. */

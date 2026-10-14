@@ -1,11 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import {
-  MANIFEST_PATH,
-  UNIFIED_MODELS_ROOT,
-  classifierPath,
-  type ClassifierHead,
-} from './paths';
+import { MANIFEST_PATH, UNIFIED_MODELS_ROOT, classifierPath, type ClassifierHead } from './paths';
 
 export interface UnifiedHeadManifest {
   classifierPath: string;

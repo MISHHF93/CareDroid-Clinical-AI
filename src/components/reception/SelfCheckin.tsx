@@ -242,6 +242,14 @@ export default function SelfCheckin({
         </p>
       </header>
 
+      <div className="self-checkin__emergency-alert" role="note" aria-label="Emergency Notice">
+        <span className="self-checkin__emergency-alert-badge">EMERGENCY NOTICE</span>
+        <span>
+          If you are experiencing severe chest pain, shortness of breath, sudden weakness, or
+          uncontrolled bleeding, do not use this screen — notify reception staff immediately.
+        </span>
+      </div>
+
       {integrationMessage ? (
         <div className="self-checkin__integration" role="note">
           <strong>Health record lookup:</strong>

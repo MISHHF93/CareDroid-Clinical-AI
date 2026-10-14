@@ -134,9 +134,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.emergency-whiteboard-page__filters button,
+.emergency-whiteboard-page__filters button {
+  min-height: 28px;
+}
+
 .emergency-whiteboard-page__intake-button {
-  min-height: var(--ed-touch-target);
+  min-height: 30px;
 }
 
 .emergency-whiteboard-page__grid {

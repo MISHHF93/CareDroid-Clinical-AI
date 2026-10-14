@@ -254,7 +254,7 @@ import { HttpMetricsInterceptor } from './common/interceptors/http-metrics.inter
     MedicalControlPlaneModule,
 
     // Clinical Agent Command Platform — first vertical slice (deterministic
-    // deterioration investigation runner). See CLINICAL_AGENT_COMMAND_PLATFORM.md.
+    // deterioration investigation runner). See CAREDROID_CLINICAL_PRODUCT_SPECIFICATION.md.
     ChiefInvestigationModule,
 
     // Encryption (Batch 4)

@@ -11,7 +11,8 @@ async function analyzeNluErrors(): Promise<void> {
   if (!existsSync(weightsPath) || testData.length === 0) return;
 
   const classifier = loadAnyClassifier(weightsPath);
-  const wrong: Array<{ text: string; expected: string; predicted: string; confidence: number }> = [];
+  const wrong: Array<{ text: string; expected: string; predicted: string; confidence: number }> =
+    [];
 
   for (const example of testData) {
     const embedding = await embedText(example.text);

@@ -145,8 +145,8 @@
 
 .cd-ai-panel__header strong {
   align-items: center;
-  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 12%, #ffffff);
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, #0ea5e9) 30%, #ffffff);
+  background: color-mix(in srgb, var(--app-accent-action, #0d9488) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #0d9488) 30%, #ffffff);
   border-radius: 999px;
   color: var(--app-accent);
   display: inline-flex;
@@ -333,7 +333,7 @@
 }
 
 .cd-ai-card__next {
-  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 8%, #ffffff);
+  background: color-mix(in srgb, var(--app-accent-action, #0d9488) 8%, #ffffff);
   color: var(--app-accent);
   padding: 10px;
 }

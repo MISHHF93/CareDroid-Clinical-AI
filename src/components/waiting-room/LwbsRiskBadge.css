@@ -60,7 +60,7 @@
 
 .lwbs-risk-strip__subtitle {
   margin: 0.25rem 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 0.78rem;
 }
 

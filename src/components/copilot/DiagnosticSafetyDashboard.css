@@ -33,7 +33,7 @@
 
 .diagnostic-safety-dashboard__subtitle {
   margin: 4px 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
   max-width: 720px;
 }
@@ -128,7 +128,7 @@
 
 .diagnostic-safety-dashboard__meta {
   margin: 2px 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
 }
 

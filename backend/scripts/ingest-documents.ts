@@ -62,9 +62,7 @@ async function bootstrap() {
 
   try {
     // Get list of files to ingest
-    const files = options.directory
-      ? getFilesFromDirectory(options.directory)
-      : [options.file!];
+    const files = options.directory ? getFilesFromDirectory(options.directory) : [options.file!];
 
     console.log(`📚 Found ${files.length} file(s) to ingest\n`);
 
@@ -181,10 +179,7 @@ function assertKnowledgeRegistryAllowsIngest(
   }
 
   const hash = crypto.createHash('sha256').update(fileBytes).digest('hex');
-  const rel = path
-    .relative(repoRoot, path.resolve(filePath))
-    .split(path.sep)
-    .join('/');
+  const rel = path.relative(repoRoot, path.resolve(filePath)).split(path.sep).join('/');
 
   const files = fs.readdirSync(artifactsDir).filter((n) => n.endsWith('.json'));
   type ArtifactRow = {
@@ -200,9 +195,7 @@ function assertKnowledgeRegistryAllowsIngest(
 
   let match: ArtifactRow | undefined;
   for (const name of files) {
-    const row = JSON.parse(
-      fs.readFileSync(path.join(artifactsDir, name), 'utf8'),
-    ) as ArtifactRow;
+    const row = JSON.parse(fs.readFileSync(path.join(artifactsDir, name), 'utf8')) as ArtifactRow;
     if (row.content_hash === hash || row.content_path === rel) {
       match = row;
       break;
@@ -227,10 +220,7 @@ function assertKnowledgeRegistryAllowsIngest(
       reason: `Artifact ${match.id} has rag_ingest_allowed=false`,
     };
   }
-  if (
-    match.review_status !== 'accepted' &&
-    match.review_status !== 'accepted_with_limitations'
-  ) {
+  if (match.review_status !== 'accepted' && match.review_status !== 'accepted_with_limitations') {
     return {
       ok: false,
       reason: `Artifact ${match.id} review_status=${match.review_status} (need accepted*)`,
@@ -370,7 +360,11 @@ function detectDocumentType(filePath: string, content: string): MedicalSource['t
   if (lowerPath.includes('guideline') || lowerContent.includes('guideline')) {
     return 'guideline';
   }
-  if (lowerPath.includes('drug') || lowerPath.includes('medication') || lowerContent.includes('pharmacology')) {
+  if (
+    lowerPath.includes('drug') ||
+    lowerPath.includes('medication') ||
+    lowerContent.includes('pharmacology')
+  ) {
     return 'drug_info';
   }
   if (lowerPath.includes('pathway') || lowerContent.includes('clinical pathway')) {

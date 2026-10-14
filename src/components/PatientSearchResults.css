@@ -10,7 +10,7 @@
   gap: 8px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 11px;
 }
 
@@ -83,7 +83,7 @@
 
 .patient-search-results__primary span {
   overflow: hidden;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -128,7 +128,7 @@
 .patient-search-results__empty {
   margin: 0;
   padding: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
   line-height: 1.45;
 }

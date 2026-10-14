@@ -9,8 +9,8 @@ export type SurveillanceIntegrationDomain =
   | 'facilities'
   | 'clinical_ops'
   | 'patient_safety'
-  | 'race_day'
-  | 'equine_welfare'
+  | 'emergency_response'
+  | 'infection_control'
   | 'hospital_ops'
   | 'audit';
 

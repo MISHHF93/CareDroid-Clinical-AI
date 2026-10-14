@@ -7,7 +7,7 @@
   --medical-card-bg: var(--medical-surface-card, #ffffff);
   --medical-card-fg: var(--medical-text-body, #111827);
   --medical-card-fg-muted: var(--medical-text-muted, #6b7280);
-  --medical-card-fg-subtle: var(--medical-text-subtle, #9ca3af);
+  --medical-card-fg-subtle: var(--medical-text-subtle, #64748b);
   --medical-card-border: var(--medical-border, #e2e8f0);
 
   /* Muted / inset card (neutral gray, not blue) */

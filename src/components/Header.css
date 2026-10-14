@@ -213,21 +213,17 @@
 
 .caredroid-header__palette-trigger:not(:disabled):hover,
 .caredroid-header__palette-trigger:not(:disabled):focus-visible {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
-  color: var(--medical-ink, #111827);
+  border-color: var(--cdl-brand-500, #0d9488);
+  color: var(--cdl-brand-700, #0f766e);
   outline: none;
-  background: color-mix(
-    in srgb,
-    var(--app-accent-interactive, #0ea5e9) 6%,
-    var(--app-surface-1, #ffffff)
-  );
+  background: color-mix(in srgb, var(--cdl-brand-500, #0d9488) 8%, var(--app-surface-1, #ffffff));
 }
 
 .caredroid-header__central-node {
-  border: 1px solid var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+  border: 1px solid color-mix(in srgb, var(--cdl-brand-500, #0d9488) 32%, transparent);
   border-radius: 999px;
-  background: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
-  color: var(--medical-text-link, #0ea5e9);
+  background: color-mix(in srgb, var(--cdl-brand-500, #0d9488) 8%, transparent);
+  color: var(--cdl-brand-700, #0f766e);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -369,11 +365,11 @@
 
 .caredroid-header__action:not(:disabled):hover,
 .caredroid-header__action:not(:disabled):focus-visible {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 52%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0d9488) 52%, transparent);
   color: var(--medical-ink, #111827);
   background: color-mix(
     in srgb,
-    var(--app-accent-interactive, #0ea5e9) 6%,
+    var(--app-accent-interactive, #0d9488) 6%,
     var(--app-surface-1, #ffffff)
   );
   outline: none;
@@ -423,9 +419,9 @@
 }
 
 .caredroid-header__lookup:focus-within {
-  border-color: #0284c7;
+  border-color: var(--cdl-brand-500, #0d9488);
   background: var(--app-surface-1, #ffffff);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cdl-brand-500, #0d9488) 18%, transparent);
 }
 
 .caredroid-header__lookup--emphasis {
@@ -538,10 +534,10 @@
     background-color 120ms ease;
 }
 .caredroid-header .account-menu__trigger:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0d9488) 40%, transparent);
   background: color-mix(
     in srgb,
-    var(--app-accent-interactive, #0ea5e9) 5%,
+    var(--app-accent-interactive, #0d9488) 5%,
     var(--app-surface-1, #ffffff)
   );
 }
@@ -557,10 +553,10 @@
 .caredroid-header .account-menu__avatar {
   background: color-mix(
     in srgb,
-    var(--app-accent-interactive, #0ea5e9) 14%,
+    var(--app-accent-interactive, #0d9488) 14%,
     var(--medical-accent-tint, #e0f2fe)
   );
-  color: var(--medical-accent-hover, #0284c7);
+  color: var(--medical-accent-hover, #0f766e);
   font-size: 10px;
   font-weight: 700;
 }
@@ -604,14 +600,17 @@
 
 @media (max-width: 768px) {
   .caredroid-header button {
-    min-width: 44px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .caredroid-header__topbar {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     overflow: hidden;
+    padding: 0 8px;
   }
 
   .caredroid-header__center {
@@ -620,8 +619,8 @@
 
   .caredroid-header__palette-trigger,
   .account-menu__trigger {
-    min-height: 44px !important;
-    min-width: 44px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
   }
 
   .caredroid-header__palette-trigger:active,
@@ -641,7 +640,7 @@
   .caredroid-header__actions {
     flex: 0 1 auto;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 4px;
     max-width: 100%;
     overflow: hidden;
   }
@@ -658,7 +657,13 @@
     flex: 1 1 auto;
     width: auto;
     min-width: 0;
-    max-width: min(42vw, 168px);
+    max-width: min(54vw, 220px);
+  }
+
+  .caredroid-header__lookup input {
+    font-size: 13px !important;
+    padding-left: 28px !important;
+    min-height: 34px !important;
   }
 }
 
@@ -668,10 +673,11 @@
   }
 
   .caredroid-header__lookup {
-    max-width: min(36vw, 132px);
+    max-width: min(48vw, 175px);
   }
 
   .caredroid-header__lookup input {
-    font-size: 16px;
+    font-size: 12.5px !important;
+    padding-left: 26px !important;
   }
 }

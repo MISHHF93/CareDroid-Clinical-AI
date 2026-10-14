@@ -27,14 +27,14 @@
 .reception-page-layout__body {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--cdl-panel-gap, 16px);
-  padding: var(--cdl-page-gutter-block, 16px) var(--cdl-page-gutter-inline, 24px);
+  gap: var(--cdl-panel-gap, 12px);
+  padding: var(--cdl-page-gutter-block, 10px) var(--cdl-page-gutter-inline, 16px);
   min-height: 0;
 }
 
 /* Two-column layout when sidebar exists */
 .reception-page-layout__body:has(.reception-page-layout__sidebar) {
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  grid-template-columns: minmax(0, 1.4fr) minmax(360px, 1fr);
   align-items: start;
 }
 
@@ -114,10 +114,10 @@
   padding: 0;
 }
 .reception-card--compact {
-  padding: 12px;
+  padding: 8px;
 }
 .reception-card--normal {
-  padding: 16px;
+  padding: 12px;
 }
 .reception-card--spacious {
   padding: 24px;
@@ -222,4 +222,12 @@
 .reception-page-layout--spacious .reception-page-layout__body {
   padding: 24px 32px;
   gap: 24px;
+}
+
+/* Eliminate double-nested borders inside ReceptionCard */
+.reception-card .reception-command-panel {
+  border: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }

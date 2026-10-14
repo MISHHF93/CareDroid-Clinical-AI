@@ -2,9 +2,9 @@
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
-  padding: 32px;
+  padding: var(--app-page-padding-compact, clamp(14px, 2vw, 24px));
   display: grid;
-  gap: 20px;
+  gap: var(--density-panel-gap, 16px);
   box-sizing: border-box;
 }
 
@@ -14,16 +14,16 @@
 .automation-audit-summary,
 .automation-audit-entry {
   border: 1px solid var(--panel-border);
-  border-radius: 20px;
+  border-radius: var(--density-panel-radius, 12px);
   background: var(--panel-background);
 }
 
 .automation-audit-hero {
-  padding: 24px;
+  padding: var(--density-panel-padding, 16px);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 24px;
+  gap: var(--density-panel-gap, 16px);
 }
 
 .automation-audit-eyebrow {
@@ -77,16 +77,22 @@
 }
 
 .automation-audit-tenant-filter select {
-  min-height: 44px;
+  min-height: var(--density-control-height-md, 36px);
   border: 1px solid var(--panel-border);
-  border-radius: 12px;
+  border-radius: var(--density-card-radius, 8px);
   background: var(--app-surface-1);
   color: var(--text-primary);
   padding: 0 12px;
 }
 
+@media (max-width: 640px), (pointer: coarse) {
+  .automation-audit-tenant-filter select {
+    min-height: var(--touch-target-min, 44px);
+  }
+}
+
 .automation-audit-policy {
-  padding: 16px;
+  padding: var(--density-card-padding-compact, 12px);
   display: grid;
   gap: 4px;
   background: color-mix(in srgb, #374151 8%, var(--app-surface-1));
@@ -101,7 +107,7 @@
 }
 
 .automation-audit-source {
-  padding: 14px 16px;
+  padding: 10px 14px;
   display: grid;
   gap: 4px;
   background: var(--app-surface-1);
@@ -120,35 +126,35 @@
 }
 
 .automation-audit-summary {
-  padding: 16px;
+  padding: var(--density-card-padding-compact, 12px);
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--density-panel-gap, 10px);
 }
 
 .automation-audit-summary > div {
   display: grid;
   gap: 4px;
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
+  border-radius: var(--density-card-radius, 10px);
   background: var(--app-surface-2);
-  padding: 14px;
+  padding: var(--density-card-padding-compact, 12px);
 }
 
 .automation-audit-summary strong {
   color: var(--text-primary);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
 }
 
 .automation-audit-list {
   display: grid;
-  gap: 14px;
+  gap: var(--density-panel-gap, 12px);
 }
 
 .automation-audit-entry {
-  padding: 18px;
+  padding: var(--density-card-padding-standard, 14px);
   display: grid;
-  gap: 16px;
+  gap: var(--density-panel-gap, 12px);
   border-left-width: 6px;
 }
 
@@ -203,9 +209,9 @@
   display: grid;
   gap: 4px;
   border: 1px solid var(--panel-border);
-  border-radius: 14px;
+  border-radius: var(--density-card-radius, 10px);
   background: var(--app-surface-1);
-  padding: 12px;
+  padding: 10px 12px;
   min-width: 0;
 }
 
@@ -217,7 +223,7 @@
 .automation-audit-conditions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -231,7 +237,8 @@
   border-radius: 999px;
   background: var(--app-surface-1);
   color: var(--text-secondary);
-  padding: 8px 10px;
+  padding: 4px 10px;
+  font-size: var(--font-12, 12px);
 }
 
 .condition-dot {
@@ -250,9 +257,9 @@
 
 .automation-audit-note {
   margin: 0;
-  border-radius: 12px;
+  border-radius: var(--density-card-radius, 8px);
   background: color-mix(in srgb, var(--app-warning, #d97706) 10%, var(--app-surface-1));
-  padding: 12px;
+  padding: 10px 12px;
   font-weight: 750;
 }
 
@@ -279,7 +286,7 @@
 
 @media (max-width: 640px) {
   .automation-audit-page {
-    padding: 18px;
+    padding: var(--app-page-padding-compact, 12px);
   }
 
   .automation-audit-summary,

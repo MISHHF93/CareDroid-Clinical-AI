@@ -45,22 +45,18 @@
 }
 
 .calculator-card:hover {
-  border-color: var(--accent-1);
+  border-color: var(--cdl-brand-500, var(--accent-1));
   transform: none;
   box-shadow: var(--compact-shadow, none);
 }
 
 .calculator-card.active {
-  border-color: var(--accent-1);
-  background: color-mix(
-    in srgb,
-    var(--app-accent-action, var(--app-accent-interactive)) 8%,
-    var(--app-surface)
-  );
+  border-color: var(--cdl-brand-500, var(--accent-1));
+  background: color-mix(in srgb, var(--cdl-brand-500, #0d9488) 8%, var(--app-surface));
 }
 
 .calculator-card:focus-visible {
-  outline: 2px solid var(--accent-1);
+  outline: 2px solid var(--cdl-brand-500, var(--accent-1));
   outline-offset: 3px;
 }
 
@@ -201,8 +197,8 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 10px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 10px;
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-input-border);
   border-radius: 8px;
@@ -265,8 +261,8 @@
 .calc-calculate-btn {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 14px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 14px;
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   border: none;
   border-radius: 10px;
@@ -293,8 +289,8 @@
 }
 
 .calc-reset-btn {
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 12px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-input-border);
   border-radius: 10px;
@@ -367,7 +363,8 @@
 .calc-score-value {
   font-size: clamp(1.8rem, 8vw, 2.6rem);
   font-weight: 700;
-  color: var(--accent-1);
+  font-variant-numeric: tabular-nums;
+  color: var(--cdl-brand-600, var(--accent-1));
   margin-bottom: 8px;
   line-height: 1.1;
   overflow-wrap: anywhere;

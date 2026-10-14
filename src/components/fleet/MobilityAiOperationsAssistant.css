@@ -1,0 +1,202 @@
+/* ── Mobility AI Operations Assistant ────────────────────────────── */
+.mobility-ai-assistant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--compact-panel-gap, 10px);
+  padding: var(--compact-panel-padding, 12px);
+  border-radius: var(--compact-panel-radius, 8px);
+  background: var(--app-surface-1, var(--medical-white, #ffffff));
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  box-shadow: var(--medical-shadow-soft, 0 1px 3px rgba(15, 23, 42, 0.05));
+  font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+}
+
+.mobility-ai-assistant__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  padding-bottom: 8px;
+}
+
+.mobility-ai-assistant__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobility-ai-assistant__icon-badge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--medical-accent-tint, #e0f2fe);
+  color: var(--medical-accent, #0284c7);
+}
+
+.mobility-ai-assistant__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+  line-height: 1.2;
+}
+
+.mobility-ai-assistant__subtitle {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.mobility-ai-assistant__refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--compact-control-height, 32px);
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--medical-slate-50, #f8fafc);
+  color: var(--medical-ink, #334155);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.mobility-ai-assistant__refresh-btn:hover {
+  background: var(--medical-slate-100, #f1f5f9);
+}
+
+/* ── Recommendations List ──────────────────────────────────────── */
+.mobility-ai-assistant__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rec-card {
+  padding: 10px;
+  border-radius: var(--compact-panel-radius, 6px);
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 120ms;
+}
+
+.rec-card--info {
+  border-left: 3px solid var(--medical-accent, #0284c7);
+}
+
+.rec-card--warning {
+  border-left: 3px solid #d97706;
+  background: #fffbeb;
+}
+
+.rec-card--critical {
+  border-left: 3px solid #dc2626;
+  background: #fef2f2;
+}
+
+.rec-card--applied {
+  opacity: 0.65;
+  border-left-color: #16a34a;
+}
+
+.rec-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.rec-card__icon-badge {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--medical-slate-100, #f1f5f9);
+  color: var(--medical-ink, #334155);
+  flex-shrink: 0;
+}
+
+.rec-card--warning .rec-card__icon-badge {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rec-card--critical .rec-card__icon-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.rec-card__title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rec-card__title-col strong {
+  font-size: 12.5px;
+  color: var(--medical-ink, #0f172a);
+}
+
+.rec-card__rationale {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--medical-ink-muted, #475569);
+  line-height: 1.35;
+  padding-left: 30px;
+}
+
+.rec-card__action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-left: 30px;
+  margin-top: 4px;
+}
+
+.rec-card__suggested {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--medical-ink, #1e293b);
+}
+
+.rec-apply-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 4px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-accent, #0284c7);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.rec-apply-btn:hover:not(:disabled) {
+  background: var(--medical-accent-tint, #e0f2fe);
+  border-color: var(--medical-accent, #0284c7);
+}
+
+.rec-apply-btn--applied {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+  cursor: default;
+}

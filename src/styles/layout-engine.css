@@ -195,6 +195,10 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
 }
 
+.emergency-app-shell .app-shell-main-content .emergency-route-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+}
+
 .emergency-app-shell .app-shell-main-content .cd-dashboard-grid--dense,
 .emergency-app-shell .app-shell-main-content .hospital-command-center__metric-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));

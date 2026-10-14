@@ -2,7 +2,12 @@
 // TypeScript-native classifier/dataset pieces that replaced BERT fine-tuning.
 
 import { detectSubcategory, extractKeyTerms } from './subcategory';
-import { trainClassifier, predictFromEmbedding, saveClassifier, loadClassifier } from './classifier';
+import {
+  trainClassifier,
+  predictFromEmbedding,
+  saveClassifier,
+  loadClassifier,
+} from './classifier';
 import { stratifiedSplit, intentDistribution, type NluExample } from './dataset';
 import { INTENT_CLASSES } from './training.config';
 import { mkdtempSync, rmSync } from 'fs';
@@ -75,7 +80,10 @@ describe('trainClassifier + predictFromEmbedding', () => {
   });
 
   it('round-trips through save/load', () => {
-    const embeddings = [[1, 0], [0, 1]];
+    const embeddings = [
+      [1, 0],
+      [0, 1],
+    ];
     const labels = [0, 1];
     const labelToIntent = { 0: INTENT_CLASSES[0], 1: INTENT_CLASSES[1] };
     const { weights } = trainClassifier(embeddings, labels, 2, labelToIntent, 'test-model', {

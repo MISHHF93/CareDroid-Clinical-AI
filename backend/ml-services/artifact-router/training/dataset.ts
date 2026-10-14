@@ -39,14 +39,32 @@ function parseCsvLine(line: string): string[] {
   return values;
 }
 
-export function loadArtifactTypeMap(catalogPath = path.join(MODEL_PATHS.trainingDataset, '..', '..', 'artifacts', 'caredroid_artifacts.json')) {
-  const resolved = path.resolve(path.dirname(MODEL_PATHS.trainingDataset), '..', 'artifacts', 'caredroid_artifacts.json');
+export function loadArtifactTypeMap(
+  catalogPath = path.join(
+    MODEL_PATHS.trainingDataset,
+    '..',
+    '..',
+    'artifacts',
+    'caredroid_artifacts.json',
+  ),
+) {
+  const resolved = path.resolve(
+    path.dirname(MODEL_PATHS.trainingDataset),
+    '..',
+    'artifacts',
+    'caredroid_artifacts.json',
+  );
   if (!existsSync(resolved)) return {};
-  const catalog = JSON.parse(readFileSync(resolved, 'utf8')) as Array<{ artifactId: string; type: string }>;
+  const catalog = JSON.parse(readFileSync(resolved, 'utf8')) as Array<{
+    artifactId: string;
+    type: string;
+  }>;
   return Object.fromEntries(catalog.map((item) => [item.artifactId, item.type || 'unknown']));
 }
 
-export function loadArtifactTrainingCsv(filePath = MODEL_PATHS.trainingDataset): ArtifactTrainingExample[] {
+export function loadArtifactTrainingCsv(
+  filePath = MODEL_PATHS.trainingDataset,
+): ArtifactTrainingExample[] {
   if (!existsSync(filePath)) return [];
 
   const typeMap = loadArtifactTypeMap();
@@ -122,7 +140,9 @@ export function filterByMinClassSize(
     const label = resolveLabelKey(row, mode);
     counts.set(label, (counts.get(label) ?? 0) + 1);
   }
-  const allowed = new Set([...counts.entries()].filter(([, count]) => count >= minExamples).map(([label]) => label));
+  const allowed = new Set(
+    [...counts.entries()].filter(([, count]) => count >= minExamples).map(([label]) => label),
+  );
   return rows.filter((row) => allowed.has(resolveLabelKey(row, mode)));
 }
 
@@ -219,7 +239,10 @@ function shuffle<T>(items: T[], rng: () => number): T[] {
   return result;
 }
 
-export function resolveLabelKey(example: ArtifactTrainingExample, mode: ArtifactTargetMode = 'artifact-type'): string {
+export function resolveLabelKey(
+  example: ArtifactTrainingExample,
+  mode: ArtifactTargetMode = 'artifact-type',
+): string {
   if (mode === 'artifact') return example.artifactId;
   if (mode === 'category') return example.category;
   return example.artifactType;
@@ -272,7 +295,10 @@ export function loadJsonlDataset(filepath: string): ArtifactTrainingExample[] {
     .map((line) => JSON.parse(line) as ArtifactTrainingExample);
 }
 
-export function buildLabelMaps(examples: ArtifactTrainingExample[], mode: ArtifactTargetMode = TRAINING_CONFIG.targetMode) {
+export function buildLabelMaps(
+  examples: ArtifactTrainingExample[],
+  mode: ArtifactTargetMode = TRAINING_CONFIG.targetMode,
+) {
   const labelIds = [...new Set(examples.map((row) => resolveLabelKey(row, mode)))].sort();
   const keyToLabel = Object.fromEntries(labelIds.map((id, index) => [id, index]));
   const labelToKey = Object.fromEntries(labelIds.map((id, index) => [index, id]));

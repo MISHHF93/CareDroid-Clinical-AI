@@ -1,0 +1,347 @@
+/* ── Medical Robotics Registry Panel ───────────────────────────────── */
+.medical-robotics-registry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--compact-panel-gap, 10px);
+  padding: var(--compact-panel-padding, 12px);
+  border-radius: var(--compact-panel-radius, 8px);
+  background: var(--app-surface-1, var(--medical-white, #ffffff));
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  box-shadow: var(--medical-shadow-soft, 0 1px 3px rgba(15, 23, 42, 0.05));
+  font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+}
+
+.medical-robotics-registry__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  padding-bottom: 8px;
+}
+
+.medical-robotics-registry__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.medical-robotics-registry__icon-badge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--medical-accent-tint, #e0f2fe);
+  color: var(--medical-accent, #0284c7);
+}
+
+.medical-robotics-registry__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+  line-height: 1.2;
+}
+
+.medical-robotics-registry__subtitle {
+  margin: 1px 0 0;
+  font-size: 11px;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+/* ── Toolbar ───────────────────────────────────────────────────── */
+.medical-robotics-registry__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.medical-robotics-registry__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.medical-robotics-registry__search .search-icon {
+  position: absolute;
+  left: 8px;
+  color: var(--medical-ink-subtle, #94a3b8);
+  pointer-events: none;
+}
+
+.medical-robotics-registry__search input {
+  height: var(--compact-control-height, 32px);
+  padding-left: 28px;
+  padding-right: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  font-size: 12px;
+  width: 170px;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+}
+
+.registry-select {
+  height: var(--compact-control-height, 32px);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+  cursor: pointer;
+}
+
+/* ── Grid ──────────────────────────────────────────────────────── */
+.medical-robotics-registry__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+}
+
+.robot-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--compact-panel-radius, 6px);
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  cursor: pointer;
+  transition: all 120ms ease-in-out;
+}
+
+.robot-card:hover {
+  border-color: var(--medical-accent, #0ea5e9);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.08);
+}
+
+.robot-card--selected {
+  border-color: var(--medical-accent, #0284c7);
+  background: var(--medical-accent-tint, #f0f9ff);
+  box-shadow: 0 0 0 1px var(--medical-accent, #0284c7);
+}
+
+.robot-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.robot-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.robot-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.robot-card__name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--medical-ink, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.robot-card__spec {
+  font-size: 11px;
+}
+
+.robot-card__id {
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.robot-card__energy {
+  flex-shrink: 0;
+}
+
+.energy-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--medical-slate-50, #f8fafc);
+  border: 1px solid var(--medical-border, #e2e8f0);
+  font-size: 11.5px;
+}
+
+/* ── Badges ────────────────────────────────────────────────────── */
+.status-badge {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-badge--available {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge--active {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.status-badge--charging {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-badge--maintenance {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.status-badge--neutral {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* ── Telemetry Strip ───────────────────────────────────────────── */
+.robot-card__telemetry-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--medical-slate-50, #f8fafc);
+  font-size: 11px;
+}
+
+.telemetry-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--medical-ink-muted, #475569);
+}
+
+.telemetry-chip--cold {
+  color: #0284c7;
+  background: #e0f2fe;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.telemetry-chip--warn {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.proto-tag {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.proto-tag--ros {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.proto-tag--bridge {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.proto-tag--can {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.latency-val {
+  font-size: 10px;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+/* ── Card Footer ───────────────────────────────────────────────── */
+.robot-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--medical-border, #f1f5f9);
+  padding-top: 6px;
+  margin-top: 2px;
+}
+
+.robot-card__mode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.robot-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 4px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #0f172a);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.action-btn:hover {
+  background: var(--medical-slate-100, #f1f5f9);
+}
+
+.action-btn--interlock-active {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+  animation: pulse-critical var(--cdl-pulse-critical, 1.6s) infinite;
+}
+
+.action-btn--secondary {
+  color: var(--medical-accent, #0284c7);
+}
+
+.action-btn--secondary:hover {
+  background: var(--medical-accent-tint, #e0f2fe);
+}
+
+.medical-robotics-registry__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 12px;
+  color: var(--medical-ink-muted, #475569);
+  font-size: 12px;
+  grid-column: 1 / -1;
+}

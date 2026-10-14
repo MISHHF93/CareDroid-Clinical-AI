@@ -21,11 +21,15 @@ describe('routing-maps', () => {
 
   it('infers executor from message text without coarse artifact default', () => {
     expect(
-      resolveExecutorToolId('general_clinical_query', 'calculator', 'Calculate SOFA score for sepsis'),
+      resolveExecutorToolId(
+        'general_clinical_query',
+        'calculator',
+        'Calculate SOFA score for sepsis',
+      ),
     ).toBe('sofa-calculator');
-    expect(
-      resolveExecutorToolId(undefined, 'tool', 'Check warfarin and aspirin interaction'),
-    ).toBe('drug-interactions');
+    expect(resolveExecutorToolId(undefined, 'tool', 'Check warfarin and aspirin interaction')).toBe(
+      'drug-interactions',
+    );
   });
 
   it('does not force sofa-calculator for unrelated calculator artifact type', () => {

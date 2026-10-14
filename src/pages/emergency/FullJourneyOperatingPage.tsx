@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -228,7 +228,7 @@ function JourneyView({
             : 'on track'
         }
       >
-        <div className="u-flex-wrap-gap-10-mt-10">
+        <div className="fj-metric-chip-grid u-mt-10">
           <MetricChip label="Active journeys" value={snapshot.metrics.activeJourneyTraces} />
           <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
           <MetricChip
@@ -283,7 +283,7 @@ function JourneyView({
         lead="CAD dispatch status, active EMS assessments, and pre-arrival pipeline."
         badge={cadSummary.activeAssignments}
       >
-        <div className="u-flex-wrap-gap-10-mt-10">
+        <div className="fj-metric-chip-grid u-mt-10">
           <MetricChip label="CAD units total" value={cadSummary.totalUnits} />
           <MetricChip label="Available" value={cadSummary.availableUnits} />
           <MetricChip label="En route" value={cadSummary.enRouteUnits} warn />
@@ -315,7 +315,7 @@ function JourneyView({
         lead="Active patients, queues, staff routing, and diagnostics."
         badge={snapshot.metrics.activePatients}
       >
-        <div className="u-flex-wrap-gap-10-mt-10">
+        <div className="fj-metric-chip-grid u-mt-10">
           <MetricChip label="Active patients" value={snapshot.metrics.activePatients} />
           <MetricChip label="P1/P2" value={snapshot.metrics.p1p2Patients} warn />
           <MetricChip label="Inbound EMS" value={snapshot.metrics.inboundEms} warn />
@@ -802,6 +802,8 @@ function DiagnosticsView() {
   type BoardRow = ReturnType<typeof getDiagnosticsBoard>[number];
   const [board, setBoard] = useState<BoardRow[]>(getDiagnosticsBoard());
   const [summary, setSummary] = useState(getDiagnosticsSummary());
+  const storePatients = useEmergencyStore((state) => state.patients);
+  const patientMap = useMemo(() => new Map(storePatients.map((p) => [p.id, p])), [storePatients]);
 
   const refresh = useCallback(() => {
     setBoard(getDiagnosticsBoard());
@@ -816,7 +818,7 @@ function DiagnosticsView() {
 
   return (
     <>
-      <div className="u-flex-wrap-gap-10">
+      <div className="fj-metric-chip-grid">
         <MetricChip label="Total orders" value={summary.totalOrders} />
         <MetricChip label="STAT" value={summary.statOrders} warn />
         <MetricChip label="Urgent" value={summary.urgentOrders} />
@@ -831,7 +833,7 @@ function DiagnosticsView() {
       <SectionCard
         title={
           <>
-            Diagnostics Board <MaturityChip maturity="planned" />
+            Diagnostics Board <MaturityChip maturity="active" />
           </>
         }
         lead="Active diagnostic orders sorted by priority. STAT orders appear first."
@@ -839,38 +841,56 @@ function DiagnosticsView() {
       >
         {board.length === 0 ? (
           <p className="fj-caption-13-mt">
-            Order-based diagnostics tracking is not yet built -- there is no clinician-facing way to
-            place a lab, imaging, ECG, or pharmacy order in CareDroid today, so this board can never
-            show real data. The metrics above will always read 0 until order placement is
-            implemented.
+            No active diagnostic orders. Place orders via patient chart or diagnostic workflows
+            below.
           </p>
         ) : (
           <div className="emergency-route-stack u-mt-10">
-            {board.map((row) => (
-              <article key={row.orderId} className="emergency-route-queue-row">
-                <div className="u-flex-1">
-                  <div className="u-flex-center u-gap-8">
-                    <strong className="u-fs-13">{DIAGNOSTIC_TYPE_LABELS[row.type]}</strong>
-                    <span className="fj-priority-badge" data-priority={row.priority}>
-                      {DIAGNOSTIC_PRIORITY_LABELS[row.priority]}
-                    </span>
+            {board.map((row) => {
+              const patient = patientMap.get(row.patientId);
+              const patientName = patient
+                ? patient.name || `${patient.firstName} ${patient.lastName}`.trim()
+                : row.patientId.startsWith('demo-pt-')
+                  ? `Patient #${row.patientId.replace('demo-pt-', '')}`
+                  : `Patient ${row.patientId.replace('patient-', '')}`;
+              const mrn = patient?.mrn ? ` (${patient.mrn})` : '';
+              const patientLabel = `${patientName}${mrn}`;
+              const bedInfo = patient?.roomId
+                ? ` · ${patient.roomId.replace('demo-room-', '').replace('-', ' ').toUpperCase()}`
+                : patient?.location
+                  ? ` · ${patient.location}`
+                  : '';
+
+              return (
+                <article key={row.orderId} className="emergency-route-queue-row">
+                  <div className="u-flex-1">
+                    <div className="u-flex-center u-gap-8">
+                      <strong className="u-fs-13">{DIAGNOSTIC_TYPE_LABELS[row.type]}</strong>
+                      <span className="fj-priority-badge" data-priority={row.priority}>
+                        {DIAGNOSTIC_PRIORITY_LABELS[row.priority]}
+                      </span>
+                    </div>
+                    <div className="fj-caption-12-mt">
+                      {patientLabel}
+                      {bedInfo} · {row.targetDepartment} · Ordered{' '}
+                      {new Date(row.orderedAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </div>
+                    {row.resultSummary && (
+                      <div className="fj-text-ok-12-mt">Result: {row.resultSummary}</div>
+                    )}
                   </div>
-                  <div className="fj-caption-12-mt">
-                    Patient {row.patientId.slice(-6)} · {row.targetDepartment}· Ordered{' '}
-                    {new Date(row.orderedAt).toLocaleTimeString()}
-                  </div>
-                  {row.resultSummary && (
-                    <div className="fj-text-ok-12-mt">Result: {row.resultSummary}</div>
-                  )}
-                </div>
-                <span
-                  className="emergency-route-queue-row__oldest fj-dx-status"
-                  data-status={row.status}
-                >
-                  {row.status}
-                </span>
-              </article>
-            ))}
+                  <span
+                    className="emergency-route-queue-row__oldest fj-dx-status"
+                    data-status={row.status}
+                  >
+                    {row.status.replace('_', ' ')}
+                  </span>
+                </article>
+              );
+            })}
           </div>
         )}
       </SectionCard>
@@ -929,7 +949,7 @@ function HandoffsView() {
     <>
       <CareOperationsInboxPanel />
 
-      <div className="u-flex-wrap-gap-10">
+      <div className="fj-metric-chip-grid">
         <MetricChip label="Disposition patients" value={dispositionPatients.length} />
         <MetricChip label="Pending handoffs" value={pendingHandoffs.length} warn />
         <MetricChip label="EMS handoffs active" value={arrivedEms.length} warn />
@@ -1049,7 +1069,7 @@ function ReportsView({
 
   return (
     <>
-      <div className="u-flex-wrap-gap-10">
+      <div className="fj-metric-chip-grid">
         <MetricChip label="Active journeys" value={journeyMetrics.activeJourneys} />
         <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
         <MetricChip label="Bottlenecks" value={bottlenecks?.analytics?.activeCount ?? 0} warn />

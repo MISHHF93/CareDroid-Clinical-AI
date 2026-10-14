@@ -44,7 +44,7 @@
 }
 
 .reassessment-timer-panel__status span {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 11px;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .reassessment-timer-panel__cell span {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -104,7 +104,7 @@
 }
 
 .reassessment-timer-panel__meta dt {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
 }
 
 .reassessment-timer-panel__meta dd {

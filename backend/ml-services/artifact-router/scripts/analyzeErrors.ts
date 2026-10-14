@@ -37,12 +37,16 @@ async function analyzeErrors(): Promise<void> {
     void confidence;
   }
 
-  console.log(`Errors: ${wrong.length}/${testData.length} (${((wrong.length / testData.length) * 100).toFixed(2)}% wrong)`);
+  console.log(
+    `Errors: ${wrong.length}/${testData.length} (${((wrong.length / testData.length) * 100).toFixed(2)}% wrong)`,
+  );
   console.log('\nPer-class accuracy:');
   for (const [expected, preds] of [...confusion.entries()].sort()) {
     const total = [...preds.values()].reduce((a, b) => a + b, 0);
     const correct = preds.get(expected) ?? 0;
-    console.log(`  ${expected.padEnd(18)} ${((correct / total) * 100).toFixed(1)}% (${correct}/${total})`);
+    console.log(
+      `  ${expected.padEnd(18)} ${((correct / total) * 100).toFixed(1)}% (${correct}/${total})`,
+    );
   }
 
   console.log('\nTop confusion pairs:');
@@ -52,9 +56,12 @@ async function analyzeErrors(): Promise<void> {
       if (expected !== predicted) pairs.push({ expected, predicted, count });
     }
   }
-  pairs.sort((a, b) => b.count - a.count).slice(0, 12).forEach((p) => {
-    console.log(`  ${p.expected} → ${p.predicted}: ${p.count}`);
-  });
+  pairs
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12)
+    .forEach((p) => {
+      console.log(`  ${p.expected} → ${p.predicted}: ${p.count}`);
+    });
 
   console.log('\nSample errors by labelType:');
   const byLabelType = new Map<string, number>();

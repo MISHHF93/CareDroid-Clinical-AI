@@ -3,8 +3,10 @@ import './button.css';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   compact?: boolean;
+  iconOnly?: boolean;
+  fullWidth?: boolean;
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -20,6 +22,8 @@ const Button = ({
   variant = 'primary',
   size = 'md',
   compact = false,
+  iconOnly = false,
+  fullWidth = false,
   children,
   style,
   disabled,
@@ -39,6 +43,8 @@ const Button = ({
   const describedBy =
     [ariaDescribedBy, showReason ? reasonId : null].filter(Boolean).join(' ') || undefined;
 
+  const isIconOnly = iconOnly || (!children && Boolean(leftIcon || rightIcon));
+
   const getClassName = () => {
     const variants: Record<string, string> = {
       primary: 'btn-primary',
@@ -48,6 +54,7 @@ const Button = ({
       success: 'btn-success',
     };
     const sizes: Record<string, string> = {
+      xs: 'btn-xs',
       sm: 'btn-sm',
       md: 'btn-md',
       lg: 'btn-lg',
@@ -55,8 +62,10 @@ const Button = ({
     return [
       'btn',
       variants[variant] || variants.primary,
-      sizes[size],
+      sizes[size] || sizes.md,
       compact ? 'btn-compact' : '',
+      isIconOnly ? 'btn-icon-only' : '',
+      fullWidth ? 'btn-full' : '',
       className,
     ]
       .filter(Boolean)

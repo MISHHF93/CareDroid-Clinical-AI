@@ -35,7 +35,7 @@
 
 .integration-status-panel__intro {
   margin: 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -71,7 +71,7 @@
 .integration-status-panel__category p {
   margin: 0;
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   line-height: 1.45;
 }
 
@@ -102,7 +102,7 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .integration-status-panel__live {

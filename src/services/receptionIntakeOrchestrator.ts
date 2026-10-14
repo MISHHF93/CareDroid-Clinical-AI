@@ -90,6 +90,7 @@ export type ReceptionAiIntakeAssist = {
 export const UNIFIED_INTAKE_PHASE = Object.freeze({
   critical: 'critical',
   admin: 'admin',
+  documents: 'documents',
 } as const);
 
 export type UnifiedIntakePhase = (typeof UNIFIED_INTAKE_PHASE)[keyof typeof UNIFIED_INTAKE_PHASE];

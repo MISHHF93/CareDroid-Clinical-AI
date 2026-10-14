@@ -990,6 +990,14 @@ export default function EmergencyWhiteboard() {
   }, [canUseCentralIntake, emergencyRole.role, profileNavigate]);
 
   useEffect(() => {
+    if (searchParams.get('intake') === '1' || searchParams.get('quickCreate') === '1') {
+      if (canUseCentralIntake) {
+        setShowIntake(true);
+      }
+    }
+  }, [canUseCentralIntake, searchParams]);
+
+  useEffect(() => {
     const clearFilters = () => {
       setActiveFilter('All');
       setQueueFilter(null);
@@ -1499,7 +1507,15 @@ export default function EmergencyWhiteboard() {
     ],
   );
 
-  const closeIntake = useCallback(() => setShowIntake(false), []);
+  const closeIntake = useCallback(() => {
+    setShowIntake(false);
+    if (searchParams.get('intake') || searchParams.get('quickCreate')) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('intake');
+      nextParams.delete('quickCreate');
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handlePatientAdded = useCallback(
     (patient: Patient) => {

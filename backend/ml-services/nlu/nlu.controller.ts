@@ -72,7 +72,10 @@ export class NluController implements OnModuleInit {
   @Post('batch-predict')
   async batchPredict(@Body() body: BatchPredictRequestDto): Promise<BatchPredictResult> {
     if (!Array.isArray(body?.texts) || body.texts.length === 0) {
-      throw new HttpException('texts array is required and must not be empty', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'texts array is required and must not be empty',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (body.texts.length > 100) {
       throw new HttpException('batch size must not exceed 100', HttpStatus.BAD_REQUEST);

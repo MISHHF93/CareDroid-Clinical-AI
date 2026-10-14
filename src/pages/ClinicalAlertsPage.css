@@ -242,7 +242,73 @@
 .alerts-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.alerts-list > li {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ── Pagination ─────────────────────────────────────────────────── */
+.alerts-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+}
+
+.alerts-pagination__info {
+  font-size: 13px;
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #475569));
+  font-weight: 500;
+}
+
+.alerts-pagination__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alerts-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  background: var(--color-card, #ffffff);
+  border: 1px solid var(--color-border-default, var(--medical-border, #e0f2fe));
+  border-radius: 8px;
+  color: var(--color-text-primary, #111827);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.alerts-pagination__btn:hover:not(:disabled) {
+  background: var(--app-surface-2, #f8fafc);
+  border-color: #374151;
+}
+
+.alerts-pagination__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.alerts-pagination__pages {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted, #64748b);
+  padding: 0 4px;
 }
 
 /* ── Alert card ─────────────────────────────────────────────────── */

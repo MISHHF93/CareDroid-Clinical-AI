@@ -123,6 +123,17 @@ export default function UnifiedIntakePanel({
   );
 
   const outstandingActions = useMemo(() => {
+    const hasStartedIntake = Boolean(
+      draft.chiefComplaint?.trim() ||
+      liveRedFlags.length ||
+      draft.firstName?.trim() ||
+      draft.lastName?.trim() ||
+      draft.estimatedAge ||
+      draft.dob,
+    );
+    if (!hasStartedIntake) {
+      return [];
+    }
     const items: string[] = [];
     if (!String(draft.chiefComplaint || '').trim() && routeMode === 'standard') {
       items.push('Capture chief complaint');
@@ -142,7 +153,17 @@ export default function UnifiedIntakePanel({
       );
     }
     return items;
-  }, [draft.chiefComplaint, missingCriticalFields, liveRedFlags, recommendedSafety, routeMode]);
+  }, [
+    draft.chiefComplaint,
+    draft.firstName,
+    draft.lastName,
+    draft.estimatedAge,
+    draft.dob,
+    missingCriticalFields,
+    liveRedFlags,
+    recommendedSafety,
+    routeMode,
+  ]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -191,7 +212,8 @@ export default function UnifiedIntakePanel({
           onClick={() => setPhase(UNIFIED_INTAKE_PHASE.critical)}
         >
           1. Life-critical
-          {missingCriticalFields.length ? (
+          {(String(draft.chiefComplaint || '').trim() || liveRedFlags.length) &&
+          missingCriticalFields.length ? (
             <span className="unified-intake-phase-nav__badge">{missingCriticalFields.length}</span>
           ) : null}
         </button>
@@ -206,9 +228,19 @@ export default function UnifiedIntakePanel({
         >
           2. Registration details
         </button>
+        <button
+          type="button"
+          className={`unified-intake-phase-nav__btn${phase === UNIFIED_INTAKE_PHASE.documents ? ' is-active' : ''}`}
+          {...(phase === UNIFIED_INTAKE_PHASE.documents ? { 'aria-current': 'step' as const } : {})}
+          onClick={() => setPhase(UNIFIED_INTAKE_PHASE.documents)}
+        >
+          3. Documents & OCR
+        </button>
       </nav>
 
-      {missingCriticalFields.length && phase === UNIFIED_INTAKE_PHASE.critical ? (
+      {(String(draft.chiefComplaint || '').trim() || liveRedFlags.length) &&
+      missingCriticalFields.length &&
+      phase === UNIFIED_INTAKE_PHASE.critical ? (
         <div className="reception-command-missing" role="status">
           <AlertTriangle size={18} aria-hidden="true" />
           <span>
@@ -241,48 +273,6 @@ export default function UnifiedIntakePanel({
 
       <div className="reception-command-grid unified-intake-grid">
         <section
-          className="reception-command-panel reception-command-panel--span"
-          aria-labelledby="document-scan-title"
-        >
-          <div className="reception-command-panel__header">
-            <h2 id="document-scan-title">Identity document capture</h2>
-          </div>
-          <ReceptionDocumentCapture
-            draft={draft}
-            onDraftChange={(patch) => onDraftChange(patch)}
-            actorName={actorName}
-            patientId={patientId}
-            disabled={submitting || Boolean(result)}
-          />
-        </section>
-
-        <section
-          className="reception-command-panel reception-command-panel--span"
-          aria-labelledby="arrival-type-title"
-        >
-          <div className="reception-command-panel__header">
-            <h2 id="arrival-type-title">Arrival type</h2>
-          </div>
-          <div className="reception-command-segmented" role="radiogroup" aria-label="Arrival type">
-            {ARRIVAL_TYPES.map((type) => (
-              <button
-                key={type.id}
-                type="button"
-                // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-checked is always set via the conditional spread below, the linter can't trace it statically
-                role="radio"
-                {...(draft.arrivalType === type.id
-                  ? { 'aria-checked': 'true' as const }
-                  : { 'aria-checked': 'false' as const })}
-                className={draft.arrivalType === type.id ? 'is-active' : ''}
-                onClick={() => onDraftChange({ arrivalType: type.id })}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section
           className="reception-command-panel reception-command-panel--intake"
           aria-labelledby="critical-intake-title"
         >
@@ -293,6 +283,33 @@ export default function UnifiedIntakePanel({
                 {liveRedFlags.length} red flags
               </span>
             ) : null}
+          </div>
+
+          <div className="reception-arrival-picker-wrap">
+            <span id="arrival-type-title" className="reception-arrival-picker-label">
+              Arrival type
+            </span>
+            <div
+              className="reception-command-segmented"
+              role="radiogroup"
+              aria-label="Arrival type"
+            >
+              {ARRIVAL_TYPES.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-checked is always set via the conditional spread below, the linter can't trace it statically
+                  role="radio"
+                  {...(draft.arrivalType === type.id
+                    ? { 'aria-checked': 'true' as const }
+                    : { 'aria-checked': 'false' as const })}
+                  className={draft.arrivalType === type.id ? 'is-active' : ''}
+                  onClick={() => onDraftChange({ arrivalType: type.id })}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="reception-quick-complaints" role="group" aria-label="Common complaints">
@@ -329,7 +346,7 @@ export default function UnifiedIntakePanel({
                 value={draft.chiefComplaint}
                 onChange={(event) => onDraftChange({ chiefComplaint: event.target.value })}
                 placeholder="Primary symptom or observable emergency"
-                rows={3}
+                rows={2}
               />
               {draft.chiefComplaint?.trim() ? (
                 <p
@@ -512,6 +529,22 @@ export default function UnifiedIntakePanel({
                   </button>
                 </div>
                 <label className="reception-command-field">
+                  <span>First name</span>
+                  <input
+                    value={draft.firstName || ''}
+                    onChange={(event) => onDraftChange({ firstName: event.target.value })}
+                    placeholder="Unknown allowed"
+                  />
+                </label>
+                <label className="reception-command-field">
+                  <span>Last name</span>
+                  <input
+                    value={draft.lastName || ''}
+                    onChange={(event) => onDraftChange({ lastName: event.target.value })}
+                    placeholder="Unknown allowed"
+                  />
+                </label>
+                <label className="reception-command-field">
                   <span>Sex if known</span>
                   <select
                     value={draft.sex}
@@ -615,13 +648,168 @@ export default function UnifiedIntakePanel({
                     <option value="no">None reported</option>
                   </select>
                 </label>
+                {draft.allergiesKnown === 'yes' ? (
+                  <label className="reception-command-field">
+                    <span>Allergy details</span>
+                    <input
+                      value={draft.allergies || ''}
+                      onChange={(event) => onDraftChange({ allergies: event.target.value })}
+                      placeholder="e.g. Penicillin, Sulfa"
+                    />
+                  </label>
+                ) : null}
+                {draft.medicationsKnown === 'yes' ? (
+                  <label className="reception-command-field">
+                    <span>Medication details</span>
+                    <input
+                      value={draft.medications || ''}
+                      onChange={(event) => onDraftChange({ medications: event.target.value })}
+                      placeholder="e.g. Metoprolol, Aspirin"
+                    />
+                  </label>
+                ) : null}
+                <label className="reception-command-field">
+                  <span>Insurance</span>
+                  <select
+                    value={draft.insuranceStatus || 'unknown'}
+                    onChange={(event) =>
+                      onDraftChange({
+                        insuranceStatus: event.target
+                          .value as ReceptionIntakeDraft['insuranceStatus'],
+                      })
+                    }
+                  >
+                    <option value="unknown">Unknown</option>
+                    <option value="captured">Captured</option>
+                    <option value="missing">Missing</option>
+                    <option value="deferred">Deferred</option>
+                  </select>
+                </label>
+                <label className="reception-command-field">
+                  <span>Consent</span>
+                  <select
+                    value={draft.consentStatus || 'unknown'}
+                    onChange={(event) =>
+                      onDraftChange({
+                        consentStatus: event.target.value as ReceptionIntakeDraft['consentStatus'],
+                      })
+                    }
+                  >
+                    <option value="unknown">Unknown</option>
+                    <option value="captured">Captured</option>
+                    <option value="unable">Unable</option>
+                    <option value="deferred">Deferred</option>
+                  </select>
+                </label>
+                <label className="reception-command-field">
+                  <span>Documents</span>
+                  <select
+                    value={draft.documentStatus || 'unknown'}
+                    onChange={(event) =>
+                      onDraftChange({
+                        documentStatus: event.target
+                          .value as ReceptionIntakeDraft['documentStatus'],
+                      })
+                    }
+                    title="Use Check Identity for OCR scan of ID/health card; then create & route"
+                  >
+                    <option value="unknown">Unknown</option>
+                    <option value="captured">Captured</option>
+                    <option value="missing">Missing</option>
+                    <option value="deferred">Deferred</option>
+                  </select>
+                </label>
+                <label className="reception-command-field reception-command-field--wide">
+                  <span>Reception notes</span>
+                  <textarea
+                    value={draft.notes || ''}
+                    onChange={(event) => onDraftChange({ notes: event.target.value })}
+                    placeholder="Additional observations for handoff (optional)"
+                    rows={2}
+                  />
+                </label>
               </div>
             </>
           )}
+
+          <div
+            className="reception-command-actionbar unified-intake-actionbar"
+            aria-label="Unified intake actions"
+          >
+            <button
+              type="button"
+              className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
+              data-testid="reception-save-draft"
+              onClick={onSaveDraft}
+            >
+              <Save size={17} aria-hidden="true" />
+              Save draft
+            </button>
+            <button
+              type="button"
+              className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
+              data-testid="reception-defer-admin"
+              title="Mark insurance and consent as deferred — does not block create & route"
+              disabled={submitting || Boolean(result)}
+              onClick={() => {
+                onDraftChange({
+                  insuranceStatus: 'deferred',
+                  consentStatus: 'deferred',
+                  documentStatus:
+                    draft.documentStatus === 'captured' ? draft.documentStatus : 'deferred',
+                });
+              }}
+            >
+              Defer admin
+            </button>
+            <button
+              type="button"
+              className={
+                primaryAction.tone === 'critical'
+                  ? 'reception-command-actionbar__critical unified-intake-actionbar__primary'
+                  : 'reception-command-actionbar__primary unified-intake-actionbar__primary'
+              }
+              data-testid="reception-create-route"
+              disabled={submitting || !canCreatePatient}
+              title={
+                !canCreatePatient
+                  ? 'Your profile cannot create patients. Switch to a registration-enabled role.'
+                  : submitting
+                    ? 'Creating patient and routing to triage…'
+                    : primaryAction.label
+              }
+              aria-disabled={submitting || !canCreatePatient ? 'true' : 'false'}
+              onClick={() => {
+                if (submitting || !canCreatePatient) return;
+                void onRoute();
+              }}
+            >
+              {primaryAction.startsThreeMinuteResponse ? (
+                <Timer size={17} aria-hidden="true" />
+              ) : (
+                <UserPlus size={17} aria-hidden="true" />
+              )}
+              {submitting ? 'Creating & routing…' : primaryAction.label}
+            </button>
+            {result && onReset ? (
+              <button
+                type="button"
+                className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
+                data-testid="reception-next-patient"
+                onClick={onReset}
+              >
+                Next patient
+              </button>
+            ) : null}
+          </div>
         </section>
 
         <aside
-          className="reception-command-panel reception-command-panel--assist"
+          className={`reception-command-panel reception-command-panel--assist${
+            !aiAssist && outstandingActions.length === 0
+              ? ' reception-command-panel--assist-idle'
+              : ''
+          }`}
           aria-labelledby="ai-assist-title"
         >
           <div className="reception-command-panel__header">
@@ -704,79 +892,26 @@ export default function UnifiedIntakePanel({
           )}
         </aside>
 
+        <section
+          className={`reception-command-panel reception-command-panel--span${
+            phase !== UNIFIED_INTAKE_PHASE.documents ? ' reception-command-panel--span-hidden' : ''
+          }`}
+          aria-labelledby="document-scan-title"
+        >
+          <div className="reception-command-panel__header">
+            <h2 id="document-scan-title">Identity document capture</h2>
+          </div>
+          <ReceptionDocumentCapture
+            draft={draft}
+            onDraftChange={(patch) => onDraftChange(patch)}
+            actorName={actorName}
+            patientId={patientId}
+            disabled={submitting || Boolean(result)}
+          />
+        </section>
+
         {showQueueRail ? queueRail : null}
         {showQueueRail ? alertsRail : null}
-      </div>
-
-      <div
-        className="reception-command-actionbar unified-intake-actionbar"
-        aria-label="Unified intake actions"
-      >
-        <button
-          type="button"
-          className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
-          data-testid="reception-save-draft"
-          onClick={onSaveDraft}
-        >
-          <Save size={17} aria-hidden="true" />
-          Save draft
-        </button>
-        <button
-          type="button"
-          className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
-          data-testid="reception-defer-admin"
-          title="Mark insurance and consent as deferred — does not block create & route"
-          disabled={submitting || Boolean(result)}
-          onClick={() => {
-            onDraftChange({
-              insuranceStatus: 'deferred',
-              consentStatus: 'deferred',
-              documentStatus:
-                draft.documentStatus === 'captured' ? draft.documentStatus : 'deferred',
-            });
-          }}
-        >
-          Defer admin
-        </button>
-        <button
-          type="button"
-          className={
-            primaryAction.tone === 'critical'
-              ? 'reception-command-actionbar__critical unified-intake-actionbar__primary'
-              : 'reception-command-actionbar__primary unified-intake-actionbar__primary'
-          }
-          data-testid="reception-create-route"
-          disabled={submitting || !canCreatePatient}
-          title={
-            !canCreatePatient
-              ? 'Your profile cannot create patients. Switch to a registration-enabled role.'
-              : submitting
-                ? 'Creating patient and routing to triage…'
-                : primaryAction.label
-          }
-          aria-disabled={submitting || !canCreatePatient ? 'true' : 'false'}
-          onClick={() => {
-            if (submitting || !canCreatePatient) return;
-            void onRoute();
-          }}
-        >
-          {primaryAction.startsThreeMinuteResponse ? (
-            <Timer size={17} aria-hidden="true" />
-          ) : (
-            <UserPlus size={17} aria-hidden="true" />
-          )}
-          {submitting ? 'Creating & routing…' : primaryAction.label}
-        </button>
-        {result && onReset ? (
-          <button
-            type="button"
-            className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
-            data-testid="reception-next-patient"
-            onClick={onReset}
-          >
-            Next patient
-          </button>
-        ) : null}
       </div>
     </>
   );

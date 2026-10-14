@@ -25,6 +25,7 @@ import {
   EMERGENCY_OS_ROUTE_COMMANDS,
   EMERGENCY_OS_HELP_COMMANDS,
   EMERGENCY_OS_TOOL_COMMANDS,
+  EMERGENCY_OS_MOBILITY_COMMANDS,
 } from '../config/commandPalette.config';
 import { navigateToEmergencySurface } from '../services/navigateToEmergencySurface';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
@@ -800,6 +801,23 @@ function createCommands(
           ' in the active CareDroid shell.',
           ' in Medical Tools.',
         ),
+      })),
+    ...createEmergencyRouteCommands(
+      navigate,
+      emergencyRole,
+      EMERGENCY_OS_MOBILITY_COMMANDS,
+      saasRole,
+      suppressExtensionPaletteCommands,
+    )
+      .filter(
+        (command) =>
+          !compiled ||
+          !command.requiredRoute ||
+          isRouteAllowedInCompiledProfile(command.requiredRoute, compiled),
+      )
+      .map((command) => ({
+        ...command,
+        group: 'Department' as const,
       })),
     ...EMERGENCY_OS_HELP_COMMANDS.map((command) => {
       const built = command.build() as {

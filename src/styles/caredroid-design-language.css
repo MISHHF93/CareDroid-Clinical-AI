@@ -102,6 +102,13 @@
   align-items: center;
   grid-auto-flow: column;
   justify-content: flex-start;
+  width: 100%;
+}
+
+.cdl-zone--primary-actions:has(.emergency-route-card),
+.cdl-zone--primary-actions:has(.cd-surface-card),
+.cdl-zone--primary-actions:has(.hospital-command-center__actions) {
+  display: block;
 }
 
 .cdl-zone--active-work {

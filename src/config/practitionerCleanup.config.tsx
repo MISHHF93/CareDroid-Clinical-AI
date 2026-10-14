@@ -132,7 +132,12 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressAdminSecondaryLinks: true,
   /** Emergency satellite routes — patients, queues, reassessment, capacity */
   suppressEmergencyRouteDescriptions: true,
-  suppressEmergencyRouteMetricCards: true,
+  /**
+   * Re-enabled for clinical command center dashboard parity:
+   * MetricGrid cards (Capacity score, Occupied, Available, Blocked rooms, Boarding,
+   * Reassessment due) provide vital clinical visibility and eliminate empty whitespace voids.
+   */
+  suppressEmergencyRouteMetricCards: false,
   suppressEmergencyRouteCrossLinks: true,
   suppressCapacityUpgradeHarness: true,
   /** EMS — handoff rows first; hide duplicate offload panel */
@@ -177,8 +182,8 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressPageEyebrows: true,
   /** Entry hub — hide backend wiring status for manual testers */
   suppressEntryHubBackendSync: true,
-  /** Satellite ED routes — hide metric strips entirely (not just card layout) */
-  suppressEmergencyRouteMetrics: true,
+  /** Satellite ED routes — metric strips enabled for real clinical visibility */
+  suppressEmergencyRouteMetrics: false,
   /** Reception — patient-answers research panel stays in data layer only */
   suppressReceptionPatientAnswersPanel: true,
   /** Keep all roles on the trimmed reception desk layout during pilot */

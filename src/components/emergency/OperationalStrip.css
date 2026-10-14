@@ -107,7 +107,7 @@
     var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: var(--cdl-clinical-radius-sm, 10px);
   background: var(--app-surface-1, #ffffff);
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   padding: 6px 12px;
   text-align: left;
   font: inherit;

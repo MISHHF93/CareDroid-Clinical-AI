@@ -3,7 +3,7 @@
  *
  * HTTP entry point for the first Agent Command Platform vertical slice:
  * a bounded "investigate this patient's deterioration" command. See
- * CLINICAL_AGENT_COMMAND_PLATFORM.md for the architecture this proves out.
+ * CAREDROID_CLINICAL_PRODUCT_SPECIFICATION.md for the architecture this proves out.
  *
  * Autonomy boundary enforced here is identical to the service: LEVEL_0
  * (observe/calculate) + LEVEL_2 (prepare). No endpoint on this controller

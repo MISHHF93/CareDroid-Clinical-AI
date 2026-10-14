@@ -58,6 +58,7 @@ function SummaryStrip({
               fontWeight: 800,
               color: accent || MEDICAL_THEME.ink,
               lineHeight: 1.15,
+              fontVariantNumeric: 'tabular-nums',
             }}
           >
             {String(value)}
@@ -235,14 +236,25 @@ export default function PredictiveAnalyticsDashboard() {
 
   return (
     <main className="pad-page">
-      {/* Header */}
-      <div className="u-mb-20">
-        <p className="pad-page-title" data-testid="cd-page-title-text">
-          Predictive Analytics Dashboard
-        </p>
-        <p className="pad-page-subtitle">
-          Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
-        </p>
+      {/* Header with integrated search */}
+      <div className="pad-page-header">
+        <div>
+          <p className="pad-page-title" data-testid="cd-page-title-text">
+            Predictive Analytics Dashboard
+          </p>
+          <p className="pad-page-subtitle">
+            Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
+          </p>
+        </div>
+        <div className="pad-search-wrap">
+          <input
+            type="text"
+            placeholder="Search models, domains, signals…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pad-search-input"
+          />
+        </div>
       </div>
 
       {/* Demo notice */}
@@ -253,17 +265,6 @@ export default function PredictiveAnalyticsDashboard() {
 
       {/* Summary strip */}
       <SummaryStrip summary={summary} />
-
-      {/* Search */}
-      <div className="pad-search-wrap">
-        <input
-          type="text"
-          placeholder="Search models, domains, signals…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="pad-search-input"
-        />
-      </div>
 
       {/* Model cards */}
       {models.length === 0 ? (

@@ -37,7 +37,7 @@
 
 .three-minute-timer__status {
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .three-minute-timer--breach .three-minute-timer__clock {

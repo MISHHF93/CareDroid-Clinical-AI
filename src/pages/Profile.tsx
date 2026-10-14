@@ -191,7 +191,7 @@ const Profile = () => {
         </Card>
       ) : null}
       <section className="profile-page">
-        <Card>
+        <div className="profile-identity-section">
           <h2 className="profile-card__title">{identityCard.title}</h2>
           {surfaces.profile.showNestedSubtitles && identityCard.subtitle ? (
             <p className="profile-card__subtitle">{identityCard.subtitle}</p>
@@ -496,7 +496,7 @@ const Profile = () => {
               ← Back to Dashboard
             </Link>
           </div>
-        </Card>
+        </div>
       </section>
     </ProfileSettingsShell>
   );

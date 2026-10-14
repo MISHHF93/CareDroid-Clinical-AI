@@ -47,7 +47,7 @@
   --copilot-ai: #374151;
   --copilot-action: #374151;
   --copilot-text: var(--color-text-primary, var(--medical-ink, #111827));
-  --copilot-muted: var(--color-text-secondary, #9ca3af);
+  --copilot-muted: var(--color-text-secondary, #64748b);
   --copilot-warning: var(--status-warning, #f59e0b);
   position: relative;
   z-index: 30;

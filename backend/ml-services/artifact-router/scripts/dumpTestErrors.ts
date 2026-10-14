@@ -35,7 +35,9 @@ async function main(): Promise<void> {
     `wrong=${wrong.length}/${testData.length} acc=${(((testData.length - wrong.length) / testData.length) * 100).toFixed(2)}%`,
   );
   for (const w of wrong) {
-    console.log(`${w.expected} -> ${w.predicted} | ${w.labelType} | ${String(w.inputText).slice(0, 120)}`);
+    console.log(
+      `${w.expected} -> ${w.predicted} | ${w.labelType} | ${String(w.inputText).slice(0, 120)}`,
+    );
   }
 }
 

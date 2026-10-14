@@ -1,11 +1,33 @@
 .cd-contextual-guidance {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  border-left: 3px solid var(--cdl-guidance-rail, var(--medical-accent, #0284c7));
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  border-left: 3px solid var(--cdl-guidance-rail, var(--medical-accent, #0f766e));
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 3px 10px;
+  margin-bottom: 4px;
+  background: var(--cdl-surface-card, #ffffff);
+  border-top: 1px solid var(--cdl-border, #e2e8f0);
+  border-right: 1px solid var(--cdl-border, #e2e8f0);
+  border-bottom: 1px solid var(--cdl-border, #e2e8f0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  font-size: 11.5px;
   transition: all var(--motion-transition-fast, 120ms);
+}
+
+.cd-contextual-guidance strong {
+  color: var(--cdl-ink, #0f172a);
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.cd-contextual-guidance span {
+  color: var(--cdl-ink-muted, #64748b);
+  font-size: 12px;
+  flex: 1 1 auto;
 }
 
 .cd-contextual-guidance--ai {
@@ -22,8 +44,8 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  flex-wrap: wrap;
-  margin-top: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* --semantic-info-text and --text-primary don't exist anywhere -- this component

@@ -31,7 +31,7 @@
 }
 
 .department-staff-bar__meta {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
 }
 
@@ -127,7 +127,7 @@
 
 .department-staff-bar__empty {
   margin: 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 13px;
 }
 

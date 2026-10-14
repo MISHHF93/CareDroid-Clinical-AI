@@ -171,7 +171,9 @@
   border-radius: var(--cdl-sidebar-item-radius, 6px);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  font: inherit;
   gap: 9px;
   padding: 6px 10px;
   color: var(--cdl-sidebar-item-fg, var(--medical-ink-muted));
@@ -272,6 +274,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: left !important;
 }
 
 .sidebar-nav-item__count {

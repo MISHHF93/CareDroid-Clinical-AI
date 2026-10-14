@@ -10,7 +10,12 @@ import {
 } from '../../nlu/training/classifier';
 import { trainMlpClassifier } from '../../nlu/training/mlpClassifier';
 import { computeClassWeights } from '../training/classWeights';
-import { buildLabelMaps, loadJsonlDataset, oversampleWeakClasses, resolveLabelKey } from '../training/dataset';
+import {
+  buildLabelMaps,
+  loadJsonlDataset,
+  oversampleWeakClasses,
+  resolveLabelKey,
+} from '../training/dataset';
 import { applyRouterPathPrior } from '../../shared/router-input';
 import { MODEL_CONFIG, MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
 
@@ -37,7 +42,10 @@ const MLP_CONFIG = {
 };
 
 async function trainArtifactRouter(): Promise<void> {
-  const trainData = oversampleWeakClasses(loadJsonlDataset(MODEL_PATHS.trainData), TRAINING_CONFIG.targetMode);
+  const trainData = oversampleWeakClasses(
+    loadJsonlDataset(MODEL_PATHS.trainData),
+    TRAINING_CONFIG.targetMode,
+  );
   const valData = loadJsonlDataset(MODEL_PATHS.validationData);
   const testData = loadJsonlDataset(MODEL_PATHS.testData);
 
@@ -57,21 +65,29 @@ async function trainArtifactRouter(): Promise<void> {
   console.log(`Train ${trainData.length} | Val ${valData.length} | Test ${testData.length}`);
 
   console.log('Computing embeddings...');
-  const trainEmbeddings = await embedWithProgress(trainData.map((row) => row.inputText), 'train');
+  const trainEmbeddings = await embedWithProgress(
+    trainData.map((row) => row.inputText),
+    'train',
+  );
   const labelFor = (row: (typeof trainData)[number]) => keyToLabel[resolveLabelKey(row, mode)];
   const trainLabels = trainData.map(labelFor);
 
   let validation: { embeddings: number[][]; labels: number[] } | undefined;
   if (valData.length > 0) {
     validation = {
-      embeddings: await embedWithProgress(valData.map((row) => row.inputText), 'val'),
+      embeddings: await embedWithProgress(
+        valData.map((row) => row.inputText),
+        'val',
+      ),
       labels: valData.map(labelFor),
     };
   }
 
   const invalidLabels = trainLabels.filter((label) => label === undefined || Number.isNaN(label));
   if (invalidLabels.length > 0) {
-    throw new Error(`Artifact router has ${invalidLabels.length} training rows with unmapped labels`);
+    throw new Error(
+      `Artifact router has ${invalidLabels.length} training rows with unmapped labels`,
+    );
   }
 
   const classWeights = TRAINING_CONFIG.useClassWeights
@@ -105,7 +121,9 @@ async function trainArtifactRouter(): Promise<void> {
   const linearValAcc = valAccuracy(linearResult.weights);
   console.log(
     `  Linear: train loss ${linearResult.epochLosses[0]?.toFixed(4)} -> ${linearResult.finalLoss.toFixed(4)}` +
-      (linearResult.bestValLoss !== null ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}` : '') +
+      (linearResult.bestValLoss !== null
+        ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}`
+        : '') +
       (linearValAcc != null ? `, val acc ${(linearValAcc * 100).toFixed(2)}%` : ''),
   );
 
@@ -132,7 +150,9 @@ async function trainArtifactRouter(): Promise<void> {
     const mlpValAcc = valAccuracy(mlpResult.weights);
     console.log(
       `  MLP: train loss ${mlpResult.epochLosses[0]?.toFixed(4)} -> ${mlpResult.finalLoss.toFixed(4)}` +
-        (mlpResult.bestValLoss !== null ? `, best val loss ${mlpResult.bestValLoss.toFixed(4)}` : '') +
+        (mlpResult.bestValLoss !== null
+          ? `, best val loss ${mlpResult.bestValLoss.toFixed(4)}`
+          : '') +
         (mlpValAcc != null ? `, val acc ${(mlpValAcc * 100).toFixed(2)}%` : ''),
     );
 
@@ -168,7 +188,10 @@ async function trainArtifactRouter(): Promise<void> {
   console.log(`Saved artifact router (${chosenName}) to ${outputPath}`);
 
   if (testData.length > 0) {
-    const testEmbeddings = await embedWithProgress(testData.map((row) => row.inputText), 'test');
+    const testEmbeddings = await embedWithProgress(
+      testData.map((row) => row.inputText),
+      'test',
+    );
     const testLabels = testData.map(labelFor);
     let correct = 0;
     let pathOverrides = 0;

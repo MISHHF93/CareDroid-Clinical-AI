@@ -148,18 +148,14 @@ export class UnifiedAiNodeService {
       classifierExists: existsSync(artifactClassifier),
       metricsExists: existsSync(artifactMetricsPath),
       architecture:
-        asString(artifactMetrics.architecture) ??
-        manifest.heads['artifact-router']?.architecture,
+        asString(artifactMetrics.architecture) ?? manifest.heads['artifact-router']?.architecture,
       accuracy: artifactAccuracy ?? undefined,
       testSetSize:
-        asNumber(artifactMetrics.testSetSize) ??
-        manifest.heads['artifact-router']?.testSetSize,
+        asNumber(artifactMetrics.testSetSize) ?? manifest.heads['artifact-router']?.testSetSize,
       evaluatedAt:
-        asString(artifactMetrics.evaluatedAt) ??
-        manifest.heads['artifact-router']?.evaluatedAt,
+        asString(artifactMetrics.evaluatedAt) ?? manifest.heads['artifact-router']?.evaluatedAt,
       trainedAt:
-        asString(artifactMetrics.trainedAt) ??
-        manifest.heads['artifact-router']?.trainedAt,
+        asString(artifactMetrics.trainedAt) ?? manifest.heads['artifact-router']?.trainedAt,
     };
 
     return {

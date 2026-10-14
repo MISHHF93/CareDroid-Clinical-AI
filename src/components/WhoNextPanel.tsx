@@ -338,7 +338,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
                 onClick={() => setPinned((current) => !current)}
                 style={{
                   ...buttonStyle,
-                  background: pinned ? '#0284c7' : '#f0f9ff',
+                  background: pinned ? 'var(--app-accent, #0f766e)' : 'var(--app-hover, #f0fdfa)',
                   color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
                   padding: '5px 8px',
                 }}
@@ -352,7 +352,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
                 onClick={() => setPinned((current) => !current)}
                 style={{
                   ...buttonStyle,
-                  background: pinned ? '#0284c7' : '#f0f9ff',
+                  background: pinned ? 'var(--app-accent, #0f766e)' : 'var(--app-hover, #f0fdfa)',
                   color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
                   padding: '5px 8px',
                 }}

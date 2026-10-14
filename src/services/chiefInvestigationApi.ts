@@ -5,7 +5,7 @@ import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
  * (backend/src/modules/chief-investigation). Deliberately separate from
  * emergencyOsApi.ts's EMERGENCY_OS_API_ENDPOINTS map -- this isn't an
  * emergency-os route, it's the first Agent Command Platform capability
- * (see CLINICAL_AGENT_COMMAND_PLATFORM.md). Mirrors requestEmergencyJson's
+ * (see CAREDROID_CLINICAL_PRODUCT_SPECIFICATION.md). Mirrors requestEmergencyJson's
  * status-preserving error handling so callers can distinguish 403 (not
  * authorized) from a transient network failure.
  */

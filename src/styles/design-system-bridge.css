@@ -12,7 +12,7 @@ html[data-theme='light'] {
   --cd-bg-sunken: var(--app-surface-muted, #f1f5f9);
   --cd-text-primary: var(--app-fg, #111827);
   --cd-text-secondary: var(--app-fg-muted, #6b7280);
-  --cd-text-disabled: var(--medical-ink-subtle, #9ca3af);
+  --cd-text-disabled: var(--medical-ink-subtle, #64748b);
   --cd-text-inverse: var(--app-on-solid, #ffffff);
   /* Was hardcoded #111827, overriding cdl-v2/compat.css's already-correct
      --cd-text-brand: var(--cdl-brand-600) alias at the same :root

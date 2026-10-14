@@ -59,7 +59,7 @@
   align-items: center;
   background: var(--app-surface-1, #ffffff);
   border: 1px solid var(--medical-border, #e0f2fe);
-  border-left: 4px solid #374151;
+  border-left: 4px solid var(--cdl-brand-600, #0f766e);
   border-radius: 14px;
   color: var(--medical-ink, #111827);
   cursor: pointer;
@@ -89,8 +89,9 @@
 }
 
 .emergency-pulse__stat strong {
-  font-size: 28px;
+  font-size: 26px;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .emergency-pulse__stat--green {
@@ -110,7 +111,7 @@
 }
 
 .emergency-pulse__stat--blue {
-  border-left-color: #374151;
+  border-left-color: var(--cdl-brand-600, #0f766e);
 }
 
 .emergency-pulse__panel {
@@ -176,22 +177,22 @@
 
 .emergency-pulse__attention-row button {
   background: var(--medical-surface-page, #f1f5f9);
-  border: 1px solid #243044;
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-left: 4px solid #f97316;
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--medical-ink, #111827);
   cursor: pointer;
   display: grid;
-  flex: 0 0 230px;
-  gap: 5px;
-  min-height: 120px;
-  padding: 12px;
+  flex: 0 0 220px;
+  gap: 4px;
+  min-height: 104px;
+  padding: 10px;
   text-align: left;
 }
 
 .emergency-pulse__attention-row button:hover,
 .emergency-pulse__attention-row button:focus-visible {
-  border-color: #374151;
+  border-color: var(--cdl-brand-500, #0d9488);
   outline: none;
 }
 
@@ -270,7 +271,7 @@
 }
 
 .emergency-pulse__health--blue {
-  background: #374151;
+  background: var(--cdl-brand-600, #0f766e);
 }
 
 .emergency-pulse__staff-row {
@@ -333,7 +334,7 @@
 }
 
 .emergency-pulse__workload span {
-  background: #374151;
+  background: var(--cdl-brand-600, #0f766e);
   border-radius: inherit;
   display: block;
   height: 100%;

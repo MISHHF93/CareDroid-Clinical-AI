@@ -1,15 +1,14 @@
 .profile-identity-page {
   flex: 1;
   width: 100%;
-  padding: 32px;
+  padding: 0;
 }
 
 .profile-identity-page__inner {
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
+  max-width: 100%;
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .profile-identity-page__header h1 {

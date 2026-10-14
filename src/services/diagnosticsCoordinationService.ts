@@ -17,7 +17,99 @@ function now(): ISODateString {
   return new Date().toISOString();
 }
 
-const orders = new Map<EntityId, DiagnosticOrder>();
+function seedInitialOrders(): Map<EntityId, DiagnosticOrder> {
+  const map = new Map<EntityId, DiagnosticOrder>();
+  const initial: DiagnosticOrder[] = [
+    {
+      id: 'dx-order-001',
+      patientId: 'demo-pt-001',
+      orderedBy: 'physician-george',
+      type: 'imaging',
+      priority: 'stat',
+      status: 'in_progress',
+      targetDepartment: 'Radiology / CT',
+      orderedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-002',
+      patientId: 'demo-pt-002',
+      orderedBy: 'physician-george',
+      type: 'lab',
+      priority: 'stat',
+      status: 'in_progress',
+      targetDepartment: 'Laboratory / Stat Core',
+      orderedAt: new Date(Date.now() - 22 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-003',
+      patientId: 'demo-pt-003',
+      orderedBy: 'physician-george',
+      type: 'ecg',
+      priority: 'stat',
+      status: 'resulted',
+      resultSummary: 'Sinus tachycardia, rate 104 bpm. No acute ST-T wave changes.',
+      targetDepartment: 'Cardiology / ED',
+      orderedAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-004',
+      patientId: 'demo-pt-001',
+      orderedBy: 'physician-george',
+      type: 'lab',
+      priority: 'urgent',
+      status: 'ordered',
+      targetDepartment: 'Laboratory / Hematology',
+      orderedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-005',
+      patientId: 'demo-pt-002',
+      orderedBy: 'physician-george',
+      type: 'imaging',
+      priority: 'urgent',
+      status: 'resulted',
+      resultSummary: 'Portable CXR: Mild cardiomegaly, clear lung bases, no pneumothorax.',
+      targetDepartment: 'Radiology',
+      orderedAt: new Date(Date.now() - 42 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-006',
+      patientId: 'demo-pt-003',
+      orderedBy: 'physician-george',
+      type: 'pharmacy-review',
+      priority: 'urgent',
+      status: 'in_progress',
+      targetDepartment: 'Pharmacy / Critical Care',
+      orderedAt: new Date(Date.now() - 18 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-007',
+      patientId: 'demo-pt-002',
+      orderedBy: 'physician-george',
+      type: 'consult',
+      priority: 'urgent',
+      status: 'ordered',
+      targetDepartment: 'Cardiology Consult',
+      orderedAt: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'dx-order-008',
+      patientId: 'demo-pt-001',
+      orderedBy: 'physician-george',
+      type: 'lab',
+      priority: 'routine',
+      status: 'ordered',
+      targetDepartment: 'Laboratory / Chemistry',
+      orderedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    },
+  ];
+  for (const o of initial) {
+    map.set(o.id, o);
+  }
+  return map;
+}
+
+const orders = seedInitialOrders();
 
 export type DiagnosticOrderParams = {
   patientId: EntityId;

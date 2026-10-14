@@ -98,18 +98,36 @@
   --touch-target-comfortable: 48px;
   --app-min-touch-target: var(--touch-target-min);
   --app-min-touch-target-comfortable: var(--touch-target-comfortable);
-  --app-control-height-sm: 34px;
-  --app-control-height-md: 40px;
-  --app-control-height-lg: 44px;
+  --app-control-height-xs: 28px;
+  --app-control-height-sm: 32px;
+  --app-control-height-md: 36px;
+  --app-control-height-lg: 40px;
+  --app-control-padding-x-xs: 6px;
   --app-control-padding-x-sm: 10px;
-  --app-control-padding-x-md: 12px;
-  --app-control-padding-x-lg: 16px;
+  --app-control-padding-x-md: 14px;
+  --app-control-padding-x-lg: 18px;
+  --app-icon-size-xs: 14px;
   --app-icon-size-sm: 16px;
-  --app-icon-size-md: 20px;
-  --app-icon-size-lg: 24px;
-  --app-icon-button-size: var(--app-control-height-lg);
+  --app-icon-size-md: 18px;
+  --app-icon-size-lg: 20px;
+  --app-icon-button-size: var(--app-control-height-md);
   --app-input-height: var(--app-control-height-md);
-  --app-button-height: 40px;
+  --app-button-height: 36px;
+
+  /* Global Density System (Default: Compact for desktop operational efficiency) */
+  --density-control-height-xs: 28px;
+  --density-control-height-sm: 32px;
+  --density-control-height-md: 36px;
+  --density-control-height-lg: 40px;
+  --density-card-padding-compact: 12px;
+  --density-card-padding-standard: 16px;
+  --density-panel-padding: 16px;
+  --density-panel-gap: 10px;
+  --density-page-gap: 12px;
+  --density-table-cell-padding: 6px 10px;
+  --density-card-radius: 10px;
+  --density-panel-radius: 12px;
+  --density-grid-card-min: 13rem;
 
   /* —— Radius scale —— */
   --app-radius-sm: var(--radius-sm);
@@ -134,33 +152,33 @@
   --app-space-field-lg: var(--space-3);
   --app-panel-gap: var(--compact-panel-gap);
   --app-page-gap: var(--compact-page-gap);
-  --app-grid-card-min: 14rem;
-  --app-grid-card-min-compact: 11.5rem;
-  --app-grid-card-min-wide: 16rem;
-  --app-card-padding-compact: 16px;
-  --app-card-padding-standard: 20px;
-  --app-card-padding-dashboard: 20px;
-  --app-card-padding-tool: 20px;
-  --app-card-padding-calculator: 20px;
-  --app-card-padding-alert: clamp(10px, 1.8vw, 14px);
-  --app-callout-padding-compact: clamp(8px, 1.6vw, var(--space-3));
-  --app-card-gap: 16px;
-  --app-modal-padding: 24px;
-  --app-modal-radius: 20px;
-  --app-page-title-size: 32px;
-  --app-section-title-size: 24px;
-  --app-card-title-size: 18px;
+  --app-grid-card-min: 13rem;
+  --app-grid-card-min-compact: 11rem;
+  --app-grid-card-min-wide: 15rem;
+  --app-card-padding-compact: 12px;
+  --app-card-padding-standard: 16px;
+  --app-card-padding-dashboard: 16px;
+  --app-card-padding-tool: 16px;
+  --app-card-padding-calculator: 16px;
+  --app-card-padding-alert: clamp(10px, 1.6vw, 14px);
+  --app-callout-padding-compact: clamp(8px, 1.4vw, var(--space-3));
+  --app-card-gap: 12px;
+  --app-modal-padding: 20px;
+  --app-modal-radius: 14px;
+  --app-page-title-size: 28px;
+  --app-section-title-size: 20px;
+  --app-card-title-size: 16px;
   --app-body-size: 14px;
   --app-caption-size: 12px;
 
   /* Compact clinical command layout primitives */
-  --compact-page-gap: clamp(10px, 1.8vw, 16px);
-  --compact-panel-gap: clamp(8px, 1.4vw, 12px);
-  --compact-card-padding: 16px;
-  --compact-panel-padding: 20px;
-  --compact-control-height: var(--app-control-height-md);
-  --compact-card-radius: 12px;
-  --compact-panel-radius: 16px;
+  --compact-page-gap: clamp(8px, 1.4vw, 12px);
+  --compact-panel-gap: clamp(6px, 1.2vw, 10px);
+  --compact-card-padding: 12px;
+  --compact-panel-padding: 16px;
+  --compact-control-height: var(--app-control-height-sm, 32px);
+  --compact-card-radius: 10px;
+  --compact-panel-radius: 12px;
   --compact-shadow: var(--app-elevation-card);
 
   /* App shell / sidebar layout */
@@ -259,6 +277,61 @@
   --app-content-max-width: 1760px;
   --app-keyboard-inset-bottom: 0px;
   --app-visual-viewport-offset-top: 0px;
+}
+
+/* Global Density Mode Settings */
+:root[data-density='comfortable'],
+[data-density='comfortable'] {
+  --density-control-height-xs: 30px;
+  --density-control-height-sm: 36px;
+  --density-control-height-md: 40px;
+  --density-control-height-lg: 44px;
+  --density-card-padding-compact: 16px;
+  --density-card-padding-standard: 20px;
+  --density-panel-padding: 20px;
+  --density-panel-gap: 14px;
+  --density-page-gap: 16px;
+  --density-table-cell-padding: 10px 14px;
+  --density-card-radius: 12px;
+  --density-panel-radius: 14px;
+  --density-grid-card-min: 14.5rem;
+  --app-card-padding-compact: 16px;
+  --app-card-padding-standard: 20px;
+  --app-card-padding-dashboard: 20px;
+  --app-card-padding-tool: 20px;
+  --app-card-padding-calculator: 20px;
+  --compact-card-padding: 16px;
+  --compact-panel-padding: 20px;
+  --compact-panel-gap: 12px;
+  --compact-page-gap: 16px;
+  --compact-control-height: 36px;
+}
+
+:root[data-density='compact'],
+[data-density='compact'] {
+  --density-control-height-xs: 28px;
+  --density-control-height-sm: 32px;
+  --density-control-height-md: 36px;
+  --density-control-height-lg: 40px;
+  --density-card-padding-compact: 12px;
+  --density-card-padding-standard: 16px;
+  --density-panel-padding: 16px;
+  --density-panel-gap: 10px;
+  --density-page-gap: 12px;
+  --density-table-cell-padding: 6px 10px;
+  --density-card-radius: 10px;
+  --density-panel-radius: 12px;
+  --density-grid-card-min: 13rem;
+  --app-card-padding-compact: 12px;
+  --app-card-padding-standard: 16px;
+  --app-card-padding-dashboard: 16px;
+  --app-card-padding-tool: 16px;
+  --app-card-padding-calculator: 16px;
+  --compact-card-padding: 12px;
+  --compact-panel-padding: 16px;
+  --compact-panel-gap: 8px;
+  --compact-page-gap: 10px;
+  --compact-control-height: 32px;
 }
 
 /* Semantic typography utilities */

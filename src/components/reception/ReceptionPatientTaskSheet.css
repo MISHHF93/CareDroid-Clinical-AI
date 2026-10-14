@@ -182,9 +182,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 32px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: var(--cdl-radius-md, 6px);
   border: 1px solid var(--cdl-border, #e2e8f0);
   background: var(--cdl-surface-muted, #f1f5f9);
   color: var(--cdl-ink, #0f172a);
@@ -194,8 +194,8 @@
 }
 
 .reception-task-sheet__action--primary {
-  background: var(--cdl-brand-600, #0284c7);
-  border-color: var(--cdl-brand-600, #0284c7);
+  background: var(--cdl-brand-600, #0f766e);
+  border-color: var(--cdl-brand-600, #0f766e);
   color: var(--cdl-on-brand, #fff);
 }
 

@@ -10,7 +10,7 @@
 }
 
 .ed-data-source--loading {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
 }
 
 .ed-data-source--stale {

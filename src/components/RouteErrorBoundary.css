@@ -27,7 +27,7 @@
 .reb-route {
   margin: 0 0 12px;
   font-size: 12px;
-  color: var(--app-text-muted, #9ca3af);
+  color: var(--app-text-muted, #64748b);
   font-family: monospace;
 }
 

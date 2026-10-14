@@ -332,7 +332,7 @@ const COMPONENT_STYLES = `
 }
 
 .handoff-brief-generator__counts {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 0.85rem;
   margin-top: 10px;
 }

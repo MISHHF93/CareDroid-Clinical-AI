@@ -31,37 +31,43 @@
 
 .waiting-room-safety-board__subtitle {
   margin: 4px 0 0;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 13px;
 }
 
 .waiting-room-safety-board__summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  align-items: center;
 }
 
 .waiting-room-safety-board__summary span {
-  display: grid;
-  gap: 2px;
-  min-width: 72px;
-  padding: 8px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 10px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  border-radius: 10px;
+  border-radius: 9999px;
   background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
-  text-align: center;
+  text-align: left;
 }
 
 .waiting-room-safety-board__summary strong {
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 18px;
+  font-size: 13px;
+  font-weight: 750;
   line-height: 1;
 }
 
 .waiting-room-safety-board__summary small {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .waiting-room-safety-board__summary span[data-tone='critical'] {
@@ -84,6 +90,10 @@
 
 .waiting-room-safety-board__table-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: clamp(320px, calc(100vh - 380px), 520px);
+  border-radius: 8px;
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
 }
 
 .waiting-room-safety-board__table {
@@ -94,15 +104,20 @@
 
 .waiting-room-safety-board__table th,
 .waiting-room-safety-board__table td {
-  padding: 10px 12px;
+  padding: 6px 10px;
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   text-align: left;
-  vertical-align: top;
-  font-size: 13px;
+  vertical-align: middle;
+  font-size: 12px;
 }
 
 .waiting-room-safety-board__table thead th {
-  color: var(--color-text-secondary, #9ca3af);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-card, var(--app-surface-2, #ffffff));
+  box-shadow: 0 1px 0 var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  color: var(--color-text-secondary, #64748b);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -134,6 +149,10 @@
 
 .waiting-room-safety-board__complaint {
   max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.35;
 }
 
 .waiting-room-safety-board__badge,
@@ -210,7 +229,7 @@ html[data-theme='dark'] .waiting-room-safety-board__overdue-badge {
 }
 
 .waiting-room-safety-board__muted {
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, #64748b);
   font-size: 12px;
 }
 

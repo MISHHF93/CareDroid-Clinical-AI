@@ -31,14 +31,14 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  padding: 9px 12px;
-  min-height: var(--cdl-control-height-lg, var(--app-input-height, 44px));
-  font-size: var(--cdl-text-md, var(--text-input-min, 15px));
+  padding: 6px 12px;
+  min-height: var(--density-control-height-md, var(--app-input-height, 36px));
+  font-size: var(--cdl-text-sm, 14px);
   font-family: inherit;
   color: var(--cdl-ink, var(--app-text-primary));
   background: var(--cdl-surface-card, var(--app-input-bg));
   border: 1px solid var(--cdl-border-input, var(--app-input-border));
-  border-radius: var(--cdl-control-radius, var(--cdl-radius-md, 10px));
+  border-radius: var(--density-card-radius, var(--cdl-radius-md, 8px));
   outline: none;
   transition:
     background-color 0.2s var(--ease-smooth),
@@ -149,15 +149,23 @@ textarea.input-field {
   font-family: inherit;
 }
 
-.input-compact {
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 10px;
-  font-size: var(--text-input-min, var(--font-16));
+.input-compact,
+.input-field.input-compact {
+  min-height: var(--density-control-height-sm, var(--app-control-height-sm, 32px));
+  padding: 4px 10px;
+  font-size: var(--cdl-text-sm, 13px);
+  border-radius: var(--density-card-radius, var(--app-radius-sm, 6px));
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive Touch Targets */
+@media (max-width: 640px), (pointer: coarse) {
   .input-field {
-    font-size: var(--text-input-min, var(--font-16));
+    min-height: var(--touch-target-min, 44px);
+    font-size: var(--text-input-min, 16px);
+  }
+
+  .input-compact,
+  .input-field.input-compact {
+    min-height: var(--touch-target-min, 44px);
   }
 }

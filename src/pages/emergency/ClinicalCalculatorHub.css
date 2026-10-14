@@ -64,7 +64,10 @@
 
 .clinical-calculator-hub__search input {
   width: 100%;
-  min-height: 44px;
+  min-height: 32px;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 13px;
   border: 1px solid var(--app-panel-border);
   border-radius: 12px;
   background: var(--app-surface);
@@ -93,13 +96,16 @@
 
 .clinical-calculator-hub__tabs button {
   flex: 0 0 auto;
-  padding: 9px 14px;
+  padding: 6px 12px;
+  font-size: 12.5px;
   font-weight: 700;
+  min-height: 30px;
 }
 
 .clinical-calculator-hub__tabs button.is-active {
-  border-color: #374151;
-  background: color-mix(in srgb, #374151 14%, var(--app-surface-1));
+  border-color: var(--cdl-brand-600, #0f766e);
+  background: var(--cdl-brand-50, #f0fdfa);
+  color: var(--cdl-brand-700, #0f766e);
 }
 
 .clinical-calculator-hub__patient-bar {
@@ -134,7 +140,9 @@
   gap: 5px;
   border: 1px solid var(--app-panel-border);
   border-radius: 999px;
-  background: color-mix(in srgb, #374151 10%, var(--app-surface));
+  background: var(--cdl-brand-50, #f0fdfa);
+  border-color: color-mix(in srgb, var(--cdl-brand-500, #0d9488) 35%, transparent);
+  color: var(--cdl-brand-700, #0f766e);
   color: var(--app-text-secondary);
   padding: 6px 9px;
   font-size: 0.78rem;
@@ -179,8 +187,8 @@
 }
 
 .clinical-calculator-card.is-active {
-  border-color: #374151;
-  box-shadow: 0 0 0 2px color-mix(in srgb, #374151 18%, transparent);
+  border-color: var(--cdl-brand-600, #0f766e);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cdl-brand-500, #0d9488) 25%, transparent);
 }
 
 .clinical-calculator-card--disabled {
@@ -231,8 +239,10 @@
   border: 1px solid var(--app-panel-border);
   border-radius: 999px;
   padding: 8px 14px;
-  color: #374151;
-  font-weight: 800;
+  color: var(--cdl-brand-700, #0f766e);
+  border-color: var(--cdl-brand-500, #0d9488);
+  background: var(--cdl-brand-50, #f0fdfa);
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -253,8 +263,9 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 38px;
-  padding: 8px 14px;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
   font-weight: 700;
 }
 
@@ -263,8 +274,8 @@
      fixed literal (not theme-toggling), so the text needs to stay a fixed
      white too -- --app-on-solid would be wrong here (it flips to a dark navy
      in dark mode, meant for pairing with a different, theme-aware accent). */
-  border-color: #374151;
-  background: #374151;
+  border-color: var(--cdl-brand-600, #0f766e);
+  background: var(--cdl-brand-600, #0f766e);
   color: #fff;
 }
 

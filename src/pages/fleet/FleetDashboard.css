@@ -1,7 +1,7 @@
 .fleet-dashboard {
   display: grid;
-  gap: 18px;
-  padding: clamp(16px, 2vw, 28px);
+  gap: 14px;
+  padding: clamp(14px, 1.8vw, 24px);
   color: var(--app-fg, var(--medical-text-body, #111827));
 }
 
@@ -24,14 +24,54 @@
   border: 1px solid var(--app-panel-border, #e2e8f0);
 }
 
+.fleet-dashboard__tab-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+.fleet-tab-btn {
+  height: var(--compact-control-height, 32px);
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid var(--medical-border, #cbd5e1);
+  background: var(--medical-slate-50, #f8fafc);
+  color: var(--medical-ink-muted, #475569);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.fleet-tab-btn:hover {
+  background: var(--medical-slate-100, #f1f5f9);
+  color: var(--medical-ink, #0f172a);
+}
+
+.fleet-tab-btn--active {
+  background: var(--medical-accent, #0284c7);
+  border-color: var(--medical-accent, #0284c7);
+  color: var(--app-on-solid, #ffffff);
+}
+
+.fleet-tab-btn--active:hover {
+  background: var(--medical-accent-hover, #0369a1);
+  color: #ffffff;
+}
+
 .fleet-dashboard__header {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .fleet-dashboard__header .fleet-dashboard__title-text {
   margin: 0;
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(20px, 2.5vw, 26px);
   font-weight: 700;
   color: var(--medical-text-heading, var(--app-text-primary));
 }
@@ -240,4 +280,25 @@
   margin: 0;
   font-size: 13px;
   color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+@media (max-width: 768px) {
+  .fleet-dashboard__metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .fleet-dashboard__metric {
+    padding: 8px 10px !important;
+    min-height: auto !important;
+  }
+  .fleet-dashboard__metric-value {
+    font-size: 18px !important;
+  }
+  .fleet-dashboard__metric-label {
+    font-size: 11px !important;
+  }
+  .fleet-dashboard__charts {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
 }

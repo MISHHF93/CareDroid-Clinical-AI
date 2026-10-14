@@ -87,13 +87,14 @@
 }
 
 .tools-active-surface__close {
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 12px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
   border: 1px solid var(--panel-border);
   border-radius: 999px;
   background: var(--panel-background);
   color: var(--text-primary);
   font: inherit;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -137,8 +138,8 @@
 }
 
 .tools-execution-badge--local {
-  border-color: color-mix(in srgb, #374151 44%, var(--panel-border));
-  color: #374151;
+  border-color: color-mix(in srgb, var(--cdl-brand-600, #0f766e) 44%, var(--panel-border));
+  color: var(--cdl-brand-600, #0f766e);
 }
 
 .tools-execution-badge--platform {
@@ -340,13 +341,13 @@
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 10px;
-  border-radius: var(--compact-card-radius, 12px);
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 10px;
+  border-radius: var(--compact-card-radius, 10px);
   border: 1px solid var(--panel-border);
   background: var(--input-background, var(--background));
   color: var(--text-primary);
-  font-size: max(var(--text-input-min, 16px), 15px);
+  font-size: max(var(--text-input-min, 14px), 13.5px);
   text-transform: none;
   letter-spacing: normal;
   box-sizing: border-box;
@@ -366,13 +367,14 @@
 }
 
 .tools-filter-tab {
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 12px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
   border: 1px solid var(--panel-border);
   border-radius: 999px;
   background: var(--panel-background);
   color: var(--text-secondary);
   font: inherit;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -433,9 +435,9 @@
   width: min(100%, 680px);
   margin: 0 0 12px;
   padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, #374151 34%, var(--app-panel-border));
+  border: 1px solid color-mix(in srgb, var(--cdl-brand-600, #0f766e) 34%, var(--app-panel-border));
   border-radius: var(--compact-card-radius, 12px);
-  background: color-mix(in srgb, #374151 9%, var(--app-surface-1));
+  background: color-mix(in srgb, var(--cdl-brand-600, #0f766e) 9%, var(--app-surface-1));
 }
 
 .tools-workspace-os strong {
@@ -769,9 +771,9 @@
 }
 
 .tool-category--lifecycle-beta {
-  border-color: color-mix(in srgb, #374151 34%, var(--app-border));
-  background: color-mix(in srgb, #374151 10%, var(--app-surface));
-  color: #374151;
+  border-color: color-mix(in srgb, var(--cdl-brand-600, #0f766e) 34%, var(--app-border));
+  background: color-mix(in srgb, var(--cdl-brand-600, #0f766e) 10%, var(--app-surface));
+  color: var(--cdl-brand-600, #0f766e);
 }
 
 .tool-category--lifecycle-experimental,
@@ -904,34 +906,34 @@
 .btn-open-tool {
   flex: 1;
   min-width: min(100%, 10rem);
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 12px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
   border: 1px solid var(--app-accent-action, var(--app-accent-interactive));
-  border-radius: var(--app-radius-md, 12px);
+  border-radius: var(--app-radius-md, 10px);
   background: var(--app-accent-action, var(--app-accent-interactive));
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--app-on-solid);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-open-tool:hover {
-  background: #111827;
-  border-color: #111827;
+  background: var(--cdl-brand-700, #0f766e);
+  border-color: var(--cdl-brand-700, #0f766e);
   transform: none;
 }
 
 .btn-chat-tool {
   flex: 1 1 10rem;
   min-width: min(100%, 10rem);
-  min-height: var(--compact-control-height, 38px);
-  padding: 8px 12px;
-  border: 2px solid var(--panel-border);
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
+  border: 1px solid var(--panel-border);
   background: transparent;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s;
@@ -984,7 +986,7 @@
 }
 
 .tip-card:hover {
-  background: color-mix(in srgb, #374151 8%, var(--app-surface-2));
+  background: color-mix(in srgb, var(--cdl-brand-600, #0f766e) 8%, var(--app-surface-2));
   transform: none;
 }
 
@@ -1008,11 +1010,11 @@
 }
 
 .tools-chat-only {
-  margin-bottom: 40px;
-  padding: 24px;
+  margin-bottom: var(--density-panel-gap, 16px);
+  padding: var(--density-panel-padding, var(--compact-panel-padding, 16px));
   background: var(--panel-background);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
+  border-radius: var(--density-card-radius, var(--compact-panel-radius, 12px));
 }
 
 .tools-chat-only-header {

@@ -26,7 +26,7 @@
 }
 
 .shift-summary__eyebrow {
-  color: #374151;
+  color: var(--cdl-ink-muted, #334155);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -52,7 +52,7 @@
 .shift-summary p,
 .shift-summary small,
 .shift-summary__section-header p {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .shift-summary__hero p {
@@ -64,24 +64,24 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--app-primary, #0284c7);
+  border: 1px solid var(--cdl-brand-600, #0f766e);
   border-radius: var(--radius-md, 10px);
-  background: var(--app-primary, #0284c7);
+  background: var(--cdl-brand-600, #0f766e);
   color: #ffffff;
   cursor: pointer;
   font-weight: 750;
   font-size: 0.88rem;
   padding: 10px 18px;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.25);
   transition: all 140ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shift-summary__handoff:hover {
-  background: var(--app-primary-hover, #0369a1);
-  border-color: var(--app-primary-hover, #0369a1);
+  background: var(--cdl-brand-700, #0d9488);
+  border-color: var(--cdl-brand-700, #0d9488);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.35);
 }
 
 .shift-summary__handoff:active {
@@ -89,7 +89,7 @@
 }
 
 .shift-summary__handoff:focus-visible {
-  outline: 2px solid var(--app-primary, #0284c7);
+  outline: 2px solid var(--cdl-brand-600, #0f766e);
   outline-offset: 2px;
 }
 
@@ -113,12 +113,13 @@
 .shift-summary__header-card span,
 .shift-summary__clinical-grid span,
 .shift-summary__stat span {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
 }
 
 .shift-summary__header-card strong {
   font-size: 24px;
+  font-variant-numeric: tabular-nums;
 }
 
 .shift-summary__status {
@@ -211,7 +212,7 @@
 }
 
 .shift-summary__table th {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -230,7 +231,7 @@
 
 .shift-summary__timeline article {
   align-items: center;
-  border-left: 3px solid #374151;
+  border-left: 3px solid var(--cdl-brand-600, #0f766e);
   display: grid;
   gap: 3px;
   padding: 6px 0 6px 12px;
@@ -308,7 +309,7 @@
 }
 
 .shift-summary__limitations li {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   margin-top: 4px;
 }
 

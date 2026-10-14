@@ -66,19 +66,22 @@ describe('assetEntitlements', () => {
     setPlatformEntitlementContext(null);
   });
 
-  it('duplicate-system-audit: Legacy tool id aliases -- matches the backend seed map exactly', () => {
-    // "Alias map drift breaks launch gating" -- docs/duplicate-system-audit.md's stated
-    // risk for this finding. Two independently hand-maintained copies of the same map
-    // exist (this file and backend/.../platform-asset-seed.data.ts) because the frontend
-    // needs launch-gating decisions before any network round trip. Parses the real
-    // backend source rather than trusting a second hand-typed copy, so a future edit to
-    // one side without the other fails this test instead of silently drifting.
+  it('duplicate-system-audit: Legacy tool id aliases -- shares canonical source with backend', () => {
     const backendSource = readFileSync(
       join(__dirname, '../../backend/src/modules/platform-assets/data/platform-asset-seed.data.ts'),
       'utf8',
     );
-    const backendAliases = parseAliasBlock(backendSource);
-    expect(Object.keys(backendAliases).length).toBeGreaterThan(0);
-    expect(LEGACY_TOOL_ID_ALIASES).toEqual(backendAliases);
+    const frontendSource = readFileSync(join(__dirname, 'assetEntitlements.ts'), 'utf8');
+    const canonicalSource = readFileSync(
+      join(__dirname, '../../lib/features/toolAliases.ts'),
+      'utf8',
+    );
+    const canonicalAliases = parseAliasBlock(canonicalSource);
+    expect(Object.keys(canonicalAliases).length).toBe(22);
+    expect(LEGACY_TOOL_ID_ALIASES).toEqual(canonicalAliases);
+    expect(frontendSource).toContain("from '../../lib/features/toolAliases'");
+    expect(backendSource).toContain("from '../../../../../lib/features/toolAliases'");
+    expect(LEGACY_TOOL_ID_ALIASES['diagnosis-assistant']).toEqual(['diagnosis']);
+    expect(LEGACY_TOOL_ID_ALIASES['calculators']).toEqual(['calculators', 'calculators-hub']);
   });
 });

@@ -9,74 +9,93 @@
       (HAPPENING NOW / NEEDS ATTENTION / OWNER / NEXT ACTION)
    ───────────────────────────────────────────────────────────────── */
 
-/* Outer container — lift and separate from page canvas */
+/* Outer container — lean clinical situation strip */
 .emergency-route-situation-brief {
-  border-radius: 16px;
+  border-radius: 8px;
   border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
-  box-shadow:
-    0 1px 3px rgba(15, 23, 42, 0.04),
-    0 4px 16px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* Situation brief list grid: enforce 4 columns on desktop, 2 on tablet */
+.emergency-route-situation-brief__list--graphic,
+.emergency-route-situation-brief__list,
+.cdl-situation-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  list-style: none !important;
+}
+
+@media (max-width: 1024px) {
+  .emergency-route-situation-brief__list--graphic,
+  .emergency-route-situation-brief__list,
+  .cdl-situation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
 
 /* Individual card */
 .cdl-situation-graphic-card {
-  /* HEAL-168 (MB-E17): padding/border-radius/box-shadow aligned to
-     CdlGraphicKit.css's own token values (12px 14px / var(--cdl-clinical-
-     radius, 12px) / var(--cdl-clinical-shadow-rest)) -- this primitive is
-     consumed across many different pages/chunks with no single
-     predictable cascade winner, same reasoning as .patient-card (HEAL-161).
-     The --information/--warning/--critical !important backgrounds below
-     are left untouched -- deliberately marked as intentional. */
-  padding: 12px 14px;
-  border-radius: var(--cdl-clinical-radius, 12px);
+  padding: 4px 8px;
+  border-radius: 6px;
   border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
-  box-shadow: var(--cdl-clinical-shadow-rest);
+  box-shadow: none;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition:
     box-shadow 140ms ease,
     transform 140ms ease;
 }
 
 .cdl-situation-graphic-card:hover {
-  box-shadow:
-    0 2px 6px rgba(15, 23, 42, 0.06),
-    0 8px 24px rgba(15, 23, 42, 0.11);
-  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  transform: none;
 }
 
-/* Decorative motif — turn it into a soft watermark */
+/* Decorative motif — hidden in high-density clinical cockpit */
 .cdl-situation-graphic-card__motif {
-  inset-inline-end: 8px;
-  inset-block-start: 8px;
-  width: 72px;
-  height: 72px;
-  opacity: 0.07;
-  transition: opacity 160ms ease;
+  display: none !important;
 }
 
-.cdl-situation-graphic-card:hover .cdl-situation-graphic-card__motif {
-  opacity: 0.11;
-}
-
-/* Icon badge — more prominent square pill */
+/* Icon badge — compact square pill */
 .cdl-situation-graphic-card .cdl-graphic-icon-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.cdl-situation-graphic-card .cdl-graphic-icon-badge svg {
+  width: 13px;
+  height: 13px;
 }
 
 /* Label — crisper micro-type */
 .cdl-situation-graphic-card__label {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* Value — clearer reading size */
+/* Value — clearer reading size with clean multi-line display */
 .cdl-situation-graphic-card__value {
-  font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.45;
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.25;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 /* Accent left rail — use ::before so it's immune to border shorthand cascade */
@@ -320,7 +339,7 @@
   font-weight: 800;
   letter-spacing: 0.09em;
   padding: 6px 10px 2px;
-  color: var(--cdl-sidebar-group-label-fg, var(--medical-ink-subtle, #9ca3af));
+  color: var(--cdl-sidebar-group-label-fg, var(--medical-ink-subtle, #64748b));
 }
 
 /* ─────────────────────────────────────────────────────────────────

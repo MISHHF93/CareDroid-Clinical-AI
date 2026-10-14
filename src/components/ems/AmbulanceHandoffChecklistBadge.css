@@ -14,7 +14,7 @@
 .amb-handoff-badge small {
   font-size: 10px;
   font-weight: 500;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .amb-handoff-badge--compact {

@@ -43,8 +43,8 @@
 }
 
 .cardiology-page__actions a {
-  min-height: var(--compact-control-height, 40px);
-  padding: 8px 14px;
+  min-height: var(--compact-control-height, 32px);
+  padding: 5px 12px;
   border-radius: var(--compact-panel-radius, 12px);
   border: 1px solid var(--medical-card-border, var(--app-panel-border));
   background: var(--medical-card-bg, var(--app-surface-1));
@@ -75,7 +75,7 @@
 
 .cardiology-page__card:hover,
 .cardiology-page__card:focus-visible {
-  border-color: var(--app-accent, #0ea5e9);
+  border-color: var(--cdl-brand-500, #0d9488);
   transform: translateY(-1px);
 }
 

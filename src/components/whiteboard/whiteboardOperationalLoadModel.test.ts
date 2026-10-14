@@ -38,6 +38,18 @@ describe('whiteboardOperationalLoadModel', () => {
     expect(evaluation.maxVisibleCards).toBeNull();
   });
 
+  it('caps visible cards when total active ED patients exceed preview limit', () => {
+    const evaluation = evaluateWhiteboardOperationalLoad({
+      waitingPatients: 4,
+      emsArrivals: 1,
+      reassessmentsDue: 1,
+      referralsPending: 1,
+      totalPatients: 98,
+    });
+
+    expect(evaluation.maxVisibleCards).toBe(18);
+  });
+
   it('simulates the requested department day', () => {
     const report = simulateWhiteboardStressScenario(WHITEBOARD_STRESS_SCENARIO);
     expect(report.scenario.waitingPatients).toBe(40);

@@ -129,7 +129,7 @@
   height: 14px;
   min-width: 14px;
   border: 2px solid var(--color-border-subtle, #e0f2fe);
-  border-top-color: #374151;
+  border-top-color: var(--cdl-brand-600, #0f766e);
   border-radius: 50%;
   animation: app-shell-loading-spin 0.7s linear infinite;
 }
@@ -190,6 +190,7 @@
   font-size: clamp(26px, 3vw, 36px);
   font-weight: 750;
   font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -240,6 +241,7 @@
   font-size: var(--font-size-xl);
   font-weight: 750;
   font-family: var(--font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
   line-height: 1.1;
 }

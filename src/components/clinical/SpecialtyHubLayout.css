@@ -75,7 +75,7 @@
 
 .specialty-hub-page__card:hover,
 .specialty-hub-page__card:focus-visible {
-  border-color: var(--app-accent, #0ea5e9);
+  border-color: var(--cdl-brand-500, #0d9488);
   transform: translateY(-1px);
 }
 
@@ -108,9 +108,9 @@
 }
 
 .specialty-hub-page__tier--b {
-  color: var(--app-accent, #0ea5e9);
-  background: color-mix(in srgb, var(--app-accent, #0ea5e9) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--app-accent, #0ea5e9) 30%, transparent);
+  color: var(--cdl-brand-500, #0d9488);
+  background: color-mix(in srgb, var(--cdl-brand-500, #0d9488) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cdl-brand-500, #0d9488) 30%, transparent);
 }
 
 .specialty-hub-page__tier--c {

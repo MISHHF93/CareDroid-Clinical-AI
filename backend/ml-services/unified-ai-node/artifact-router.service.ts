@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { existsSync } from 'fs';
 import { embedText } from '../nlu/training/embeddings';
-import { loadAnyClassifier, predictFromAny, type AnyClassifierWeights } from '../nlu/training/classifier';
+import {
+  loadAnyClassifier,
+  predictFromAny,
+  type AnyClassifierWeights,
+} from '../nlu/training/classifier';
 import { resolveClassifierPath } from '../shared/paths';
 import {
   applyRouterPathPrior,

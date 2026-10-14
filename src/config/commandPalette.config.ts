@@ -201,3 +201,59 @@ export const EMERGENCY_OS_TOOL_COMMANDS = Object.freeze([
     }),
   },
 ]);
+
+export const EMERGENCY_OS_MOBILITY_COMMANDS = Object.freeze([
+  {
+    id: 'open-fleet-command',
+    label: 'Open Fleet & Autonomous Mobility Command',
+    hint: 'Fleet',
+    keywords: [
+      'fleet',
+      'mobility',
+      'robotics',
+      'dispatch',
+      'autonomous',
+      'amr',
+      'drone',
+      'vehicles',
+    ],
+    build: () => ({ type: 'OPEN_ROUTE', path: CANONICAL_ROUTES.fleetCommand }),
+  },
+  {
+    id: 'open-vehicle-recognition',
+    label: 'Open Vehicle Recognition & Perception HUD',
+    hint: 'HUD',
+    keywords: [
+      'perception',
+      'recognition',
+      'hud',
+      'radar',
+      'lidar',
+      'obstacle',
+      'spatial',
+      'sensors',
+    ],
+    build: () => ({ type: 'OPEN_ROUTE', path: `${CANONICAL_ROUTES.fleetCommand}?tab=perception` }),
+  },
+  {
+    id: 'open-medical-robotics',
+    label: 'Open Medical Robotics Registry',
+    hint: 'Robotics',
+    keywords: ['robotics', 'amr', 'drones', 'teleoperation', 'hardware', 'ros', 'e-stop'],
+    build: () => ({ type: 'OPEN_ROUTE', path: `${CANONICAL_ROUTES.fleetCommand}?tab=robotics` }),
+  },
+  {
+    id: 'open-mobility-simulation',
+    label: 'Open Mobility Simulation Sandbox',
+    hint: 'Sim',
+    keywords: ['simulation', 'hardware in the loop', 'testbed', 'stress test', 'scenario'],
+    build: () => ({ type: 'OPEN_ROUTE', path: `${CANONICAL_ROUTES.fleetCommand}?tab=simulation` }),
+  },
+  {
+    id: 'open-mobility-ai',
+    label: 'Open Mobility AI Decision Support',
+    hint: 'Mobility AI',
+    keywords: ['mobility ai', 'dispatch ai', 're-routing', 'traffic', 'cold chain'],
+    build: () => ({ type: 'OPEN_ROUTE', path: `${CANONICAL_ROUTES.fleetCommand}?tab=ai` }),
+  },
+]);

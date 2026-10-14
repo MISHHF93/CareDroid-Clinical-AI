@@ -9,16 +9,7 @@ const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 
 function authStorage(role) {
   return {
-    caredroid_access_token: 'screenshot-audit-token',
-    // `authMode: 'open-access'` is required: UserContext.tsx reads this
-    // profile through demoPersonaModel.ts's hydrateStoredDemoUser(), which
-    // only honors a stored `role` when isDemoPersonaUser() recognizes the
-    // payload (id === OPEN_ACCESS_USER_ID, or authMode open-access/
-    // platform-access, or a matching demoPersona marker). Without one of
-    // those, the whole payload is discarded and every role here silently
-    // fell back to the app's default demo role (charge_nurse) instead of
-    // the one requested — confirmed via a standalone reconstruction of the
-    // real hydration logic (roadmap item #22, Cycle 213).
+    caredroid_access_token: 'responsive-qa-token',
     caredroid_user_profile: JSON.stringify({
       id: 'screenshot-audit-user',
       email: 'audit@caredroid.local',
@@ -27,7 +18,9 @@ function authStorage(role) {
       fullName: 'Audit User',
       isEmailVerified: true,
       twoFactorEnabled: false,
-      authMode: 'open-access',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      authMode: 'explicit-dev-bypass',
+      isDevAuthBypass: true,
     }),
   };
 }
@@ -41,26 +34,70 @@ async function main() {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 
-  for (const role of ['admin', 'registration_clerk']) {
-    const page = await context.newPage();
-    await page.addInitScript((storage) => {
-      for (const [key, value] of Object.entries(storage)) {
-        localStorage.setItem(key, value);
-      }
-    }, authStorage(role));
+  const routes = [
+    { path: '/emergency/reception', name: 'reception' },
+    { path: '/emergency/intake', name: 'intake' },
+    { path: '/emergency/self-arrival', name: 'self-arrival' },
+  ];
 
-    await page.route('**/api/**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ok: true, data: {} }),
+  for (const role of ['registration_clerk', 'admin']) {
+    for (const route of routes) {
+      const page = await context.newPage();
+      await page.addInitScript((storage) => {
+        for (const [key, value] of Object.entries(storage)) {
+          localStorage.setItem(key, value);
+        }
+      }, authStorage(role));
+
+      await page.route('**/api/users/profile**', async (r) => {
+        await r.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            id: 'screenshot-audit-user',
+            email: 'audit@caredroid.local',
+            name: 'Audit User',
+            role,
+            fullName: 'Audit User',
+            isEmailVerified: true,
+            twoFactorEnabled: false,
+            authMode: 'explicit-dev-bypass',
+            isDevAuthBypass: true,
+          }),
+        });
       });
-    });
 
-    await page.goto(`${baseURL}/emergency/reception`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1500);
-    await capture(page, `${role}-reception`);
-    await page.close();
+      await page.route('**/api/tenant/context**', async (r) => {
+        await r.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            organizationId: 'qa-organization',
+            organizationName: 'Responsive QA Hospital',
+            workspaceId: 'operations',
+            workspaceName: 'Operations Workspace',
+            userId: 'screenshot-audit-user',
+            role,
+            subscriptionPlan: 'enterprise',
+          }),
+        });
+      });
+
+      await page.route('**/api/**', async (r) => {
+        if (!r.isHandled?.()) {
+          await r.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ ok: true, data: {} }),
+          });
+        }
+      });
+
+      await page.goto(`${baseURL}${route.path}`, { waitUntil: 'networkidle' });
+      await page.waitForTimeout(1500);
+      await capture(page, `${role}-${route.name}`);
+      await page.close();
+    }
   }
 
   await browser.close();

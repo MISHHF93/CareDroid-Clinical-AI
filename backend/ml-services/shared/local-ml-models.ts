@@ -23,7 +23,9 @@ function resolveRepoRoot(): string {
   return path.resolve(fromCwd, '..');
 }
 
-export function loadLocalMlModelDescriptors(repoRoot = resolveRepoRoot()): LocalMlModelDescriptor[] {
+export function loadLocalMlModelDescriptors(
+  repoRoot = resolveRepoRoot(),
+): LocalMlModelDescriptor[] {
   const manifestFile = path.join(repoRoot, 'ml-services', 'models', 'manifest.json');
   const heads: ClassifierHead[] = ['nlu', 'artifact-router'];
 
@@ -43,7 +45,9 @@ export function loadLocalMlModelDescriptors(repoRoot = resolveRepoRoot()): Local
     const isNlu = head === 'nlu';
     return {
       // Both heads belong to the single CareDroid unified node (ADR-0003).
-      modelId: isNlu ? 'caredroid-unified-ai-node:nlu' : 'caredroid-unified-ai-node:artifact-router',
+      modelId: isNlu
+        ? 'caredroid-unified-ai-node:nlu'
+        : 'caredroid-unified-ai-node:artifact-router',
       name: isNlu ? 'CareDroid Node · NLU Intent' : 'CareDroid Node · Artifact Router',
       purpose: isNlu
         ? 'Maps clinical utterances to 10 governed intent classes for chat and AI Chief routing.'
@@ -57,7 +61,9 @@ export function loadLocalMlModelDescriptors(repoRoot = resolveRepoRoot()): Local
       architecture: typeof metrics.architecture === 'string' ? metrics.architecture : undefined,
       numClasses: typeof metrics.numClasses === 'number' ? metrics.numClasses : undefined,
       targetMode: typeof metrics.targetMode === 'string' ? metrics.targetMode : undefined,
-      manifestPath: existsSync(manifestFile) ? manifestFile.split(path.sep).join('/') : MANIFEST_PATH,
+      manifestPath: existsSync(manifestFile)
+        ? manifestFile.split(path.sep).join('/')
+        : MANIFEST_PATH,
     };
   });
 }

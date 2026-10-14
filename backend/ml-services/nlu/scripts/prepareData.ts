@@ -3,7 +3,12 @@
 
 import { existsSync } from 'fs';
 import path from 'path';
-import { loadJsonlDataset, writeJsonlDataset, stratifiedSplit, intentDistribution } from '../training/dataset';
+import {
+  loadJsonlDataset,
+  writeJsonlDataset,
+  stratifiedSplit,
+  intentDistribution,
+} from '../training/dataset';
 import { MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
 
 function prepareDatasets(): void {

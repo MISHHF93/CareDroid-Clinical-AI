@@ -25,8 +25,10 @@ export const SURVEILLANCE_INTEGRATION_DOMAIN = Object.freeze({
   facilities: 'facilities',
   clinicalOps: 'clinical_ops',
   patientSafety: 'patient_safety',
-  raceDay: 'race_day',
-  equineWelfare: 'equine_welfare',
+  emergencyResponse: 'emergency_response',
+  infectionControl: 'infection_control',
+  raceDay: 'clinical_ops',
+  equineWelfare: 'patient_safety',
   hospitalOps: 'hospital_ops',
   audit: 'audit',
 } as const);

@@ -59,7 +59,10 @@ function MetricTile({
   return (
     <div className="ai-cc-metric-tile">
       <div className="ai-cc-metric-tile__label">{label}</div>
-      <div className="ai-cc-metric-tile__value" style={{ color: accent || MEDICAL_THEME.ink }}>
+      <div
+        className="ai-cc-metric-tile__value"
+        style={{ color: accent || 'var(--app-fg, var(--medical-ink))' }}
+      >
         {value}
       </div>
       {sub && <div className="ai-cc-metric-tile__sub">{sub}</div>}

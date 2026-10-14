@@ -51,7 +51,7 @@ html[data-theme='light'] {
   --app-focus-ring-aa: var(--medical-accent, #075985);
   --app-focus-glow: var(--medical-focus, #facc15);
   --app-hover: rgba(7, 89, 133, 0.08);
-  --app-disabled: #9ca3af;
+  --app-disabled: #64748b;
   --app-input-bg: var(--medical-white, #ffffff);
   --app-input-bg-hover: var(--medical-white, #ffffff);
   --app-input-border: var(--medical-border, #cbd5e1);

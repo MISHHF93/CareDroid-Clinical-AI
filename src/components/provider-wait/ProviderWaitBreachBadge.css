@@ -65,7 +65,7 @@
 .provider-wait-breach-panel__subtitle,
 .provider-wait-breach-strip__subtitle {
   margin: 0.25rem 0 0;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
   font-size: 0.78rem;
 }
 
@@ -96,7 +96,7 @@
 .provider-wait-breach-panel__metric span,
 .provider-wait-breach-strip__count span {
   font-size: 0.72rem;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, #64748b);
 }
 
 .provider-wait-breach-panel__metric[data-tone='critical'],

@@ -20,7 +20,8 @@
 }
 
 .wnp-eyebrow {
-  color: #38bdf8;
+  color: var(--cdl-brand-600, #0f766e);
+  font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.12em;
 }
@@ -47,8 +48,9 @@
 }
 
 .wnp-btn--go {
-  background: #0ea5e9;
-  border-color: #0ea5e9;
+  background: var(--cdl-brand-600, #0f766e);
+  border-color: var(--cdl-brand-700, #0f766e);
+  color: #ffffff;
 }
 
 /* HEAL-347.21: this button used a pale, dark-mode-tuned text color

@@ -13,7 +13,13 @@ import {
   type AnyClassifierWeights,
 } from '../training/classifier';
 import { trainMlpClassifier } from '../training/mlpClassifier';
-import { INTENT_LABELS, LABEL_TO_INTENT, MODEL_CONFIG, MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
+import {
+  INTENT_LABELS,
+  LABEL_TO_INTENT,
+  MODEL_CONFIG,
+  MODEL_PATHS,
+  TRAINING_CONFIG,
+} from '../training/training.config';
 
 const MLP_CONFIG = {
   numEpochs: TRAINING_CONFIG.numEpochs,
@@ -28,8 +34,14 @@ async function train(): Promise<void> {
   console.log(`Loading embedding model: ${MODEL_CONFIG.embeddingModelName}`);
   console.log('Loading dataset...');
 
-  const { train: trainData, val: valData, test: testData } = prepareDataset(MODEL_PATHS, TRAINING_CONFIG.seed);
-  console.log(`Dataset sizes - Train: ${trainData.length}, Val: ${valData.length}, Test: ${testData.length}`);
+  const {
+    train: trainData,
+    val: valData,
+    test: testData,
+  } = prepareDataset(MODEL_PATHS, TRAINING_CONFIG.seed);
+  console.log(
+    `Dataset sizes - Train: ${trainData.length}, Val: ${valData.length}, Test: ${testData.length}`,
+  );
 
   if (trainData.length === 0) {
     console.error('No training data found. Run scripts/prepareData.ts first.');
@@ -62,7 +74,9 @@ async function train(): Promise<void> {
   );
   console.log(
     `  Linear: train loss ${linearResult.epochLosses[0]?.toFixed(4)} -> ${linearResult.finalLoss.toFixed(4)}` +
-      (linearResult.bestValLoss !== null ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}` : ''),
+      (linearResult.bestValLoss !== null
+        ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}`
+        : ''),
   );
 
   console.log(`Training MLP (hidden dim ${MLP_CONFIG.hiddenDim}) classifier head...`);

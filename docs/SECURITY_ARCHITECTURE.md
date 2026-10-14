@@ -1,77 +1,76 @@
-# CareDroid — Security Architecture & Threat Model
+# CareDroid — Enterprise Security Architecture & Zero Trust Framework
 
-**Document Version:** 2.2.0  
-**Status:** Living Security Specification  
-**Lead Authors:** Security Architect, DevSecOps Lead, Chief Technology Officer  
-**Compliance Standards:** PIPEDA (Canada), PHIPA (Ontario), HIPAA (USA), SOC 2 Type II
+**Document Version:** 3.0.0  
+**Status:** Living Security Architecture Specification  
+**Lead Authors:** Principal Security Architect, DevSecOps Lead, Chief Technology Officer  
+**Compliance Standards:** Canadian PIPEDA, Ontario PHIPA, US HIPAA, SOC 2 Type II, ISO 27001  
+**Classification:** Enterprise Healthcare Architecture & Due Diligence Authority  
 
 ---
 
-## 1. Zero Trust Security Architecture
+## 1. Zero Trust Architectural Foundation
 
-CareDroid enforces a strict **Zero Trust** security model: every request, actor, device, and service invocation must be explicitly authenticated, authorized, and logged regardless of whether it originates within or outside the hospital network boundary.
+CareDroid operates on a strict **Zero Trust** security architecture: no user, device, network, or service is inherently trusted, regardless of whether requests originate within or outside the hospital perimeter. Every transaction is explicitly authenticated, authorized, validated, and logged.
 
 ```mermaid
 flowchart LR
-    Client[Clinician Browser / Mobile] -->|TLS 1.3 + JWT| WAF[Cloudflare WAF / DDoS Shield]
-    WAF -->|mTLS| Ingress[Ingress Reverse Proxy]
-    Ingress -->|Token Validation| AuthGuard[NestJS JwtAuthGuard]
-    AuthGuard -->|Permission Check| RBAC[RolesGuard & canonicalAccess.ts]
-    RBAC -->|Tenant Isolation| Segregation[ProfileSegregationGuard]
-    Segregation -->|Encrypted SQL| DB[(PostgreSQL AES-256-GCM)]
-    Segregation -->|Append Only| Audit[(Immutable Audit Log)]
+    Client["Clinician Workstation / Tablet\n(Browser / Mobile PWA)"] -->|TLS 1.3 + Client JWT| WAF["Cloudflare WAF & DDoS Shield\n(Rate-Limiting & Bot Mitigation)"]
+    WAF -->|mTLS 1.3| Ingress["Ingress Reverse Proxy / Envoy"]
+    Ingress -->|Token Validation| AuthGuard["NestJS JwtAuthGuard\n(RS256 Signature Verification)"]
+    AuthGuard -->|Permission Resolution| RBAC["RolesGuard & canonicalAccess.ts\n(ABAC Tenant Scoping)"]
+    RBAC -->|Isolated Query| DB[("PostgreSQL 16 Multi-AZ\n(AES-256-GCM Encryption)")]
+    RBAC -->|Audit Commit| Audit[("Immutable Audit Store\n(Zero PHI in Application Logs)")]
 ```
 
 ---
 
-## 2. Authentication, Authorization & Session Lifecycle
+## 2. Authentication, Session Lifecycle & Credential Security
 
-### 2.1 Authentication & Tokens
+### 2.1 Asymmetric Token Architecture
+- **Access Tokens:** Short-lived JSON Web Tokens (15-minute expiration) signed using asymmetric **RS256** keys. Public keys are rotated quarterly; private keys reside in cloud hardware security modules (AWS KMS / Azure Key Vault).
+- **Refresh Tokens:** Long-lived tokens (8-hour maximum lifetime) transmitted exclusively in secure, `httpOnly`, `SameSite=Strict`, `Path=/api/auth` cookies.
+- **Refresh Token Rotation (RTR):** Every token refresh issues a new cryptographically random refresh token and invalidates the previous one. If a previously used refresh token is presented, the system triggers automated family revocation, immediately terminating all active sessions for that user.
 
-- **Stateless Bearer Tokens:** Authentication issues short-lived JWT access tokens (15-minute validity) signed using RS256 asymmetric keys.
-- **Refresh Token Rotation:** Refresh tokens (8-hour maximum lifetime) are stored in secure, `httpOnly`, `SameSite=Strict` cookies. Any detected token reuse immediately revokes the entire session chain.
-- **Session Expiry & Inactivity Timeout:** Workstation sessions lock automatically after 15 minutes of inactivity in clinical areas (5 minutes in public reception kiosks).
-
-### 2.2 Role-Based & Attribute-Based Access Control (RBAC/ABAC)
-
-- Access permissions are derived exclusively through `src/lib/users/canonicalAccess.ts`. Adding secondary or ad-hoc role systems is prohibited.
-- Segregation policies enforce multi-tenant isolation by tenant ID, facility ID, and assigned clinical unit/pod.
+### 2.2 Clinical Workstation Session Locks & Inactivity Timeouts
+- **Clinical Workstation Lock:** Browser sessions in clinical areas automatically lock after **15 minutes** of keyboard/mouse inactivity. Workstations display a quick-PIN or RFID badge-tap unlock prompt, restoring the clinician's exact workspace context without losing unsaved triage drafts.
+- **Public Kiosk Mode:** Self-arrival kiosks (`/emergency/self-arrival`) enforce a strict **60-second** inactivity timeout, wiping all temporary demographic form buffers to protect patient privacy.
 
 ---
 
-## 3. Protected Health Information (PHI) Protection & Privacy
+## 3. Authorization Engine: Canonical RBAC & ABAC
 
-### 3.1 Non-Negotiable PHI Rules
+Authorization is strictly governed by `src/lib/users/canonicalAccess.ts`. Introducing ad-hoc, secondary, or client-declared role systems is structurally prohibited.
 
-- **Zero PHI in Logs:** Application logs must record operational metadata only (e.g. `event=ORDER_PLACED, durationMs=34, statusCode=200`). Recording patient names, health card numbers, diagnoses, or notes in logs is strictly forbidden.
-- **Client-Side Obfuscation:** MRNs and patient names in public display modes (e.g. wallboards, kiosk waiting list) are automatically masked to initials and partial identifiers (e.g. `J. D. - Bed 4`).
-- **Synthetic Data for Dev & Test:** Local development, test suites, and staging environments use 100% synthetically generated data. Real patient records are never replicated outside production enclave boundaries.
+### 3.1 Backend Role Hierarchy
+- `PHYSICIAN`: Full read/write authority across patient records, clinical tool executions, and medication order drafting.
+- `NURSE`: Authority to record vital signs, perform CTAS acuity scoring, allocate beds, and execute nursing workflows.
+- `ADMIN`: Authority to configure department settings, manage staff rosters, and inspect operational metrics (no un-audited PHI access).
+- `STUDENT`: Read-only access to anonymized or synthetic clinical cases; order drafting requires attending co-signature.
 
-### 3.2 Cryptographic Controls
+### 3.2 Tenant Isolation (ABAC)
+- Multi-tenancy is enforced at the database query level via `@TenantScoped()` and `@OrganizationScoped()` decorators.
+- The `TenantIsolationGuard` verifies that the `tenantId` in the practitioner’s JWT matches the `organization_id` of the requested clinical record, preventing cross-hospital data leakage.
 
-- **In-Transit:** TLS 1.3 enforced across all web, API, and WebSocket channels with strict cipher suite selection (`TLS_AES_256_GCM_SHA384`).
-- **At-Rest:** Database storage volumes, table spaces, backups, and Redis caches use AES-256-GCM encryption.
+---
+
+## 4. Cryptographic Standards & Field-Level Encryption
+
+| Data State | Protocol / Standard | Cipher Suite | Key Management |
+| :--- | :--- | :--- | :--- |
+| **In-Transit (Web & API)** | TLS 1.3 (Mandatory) | `TLS_AES_256_GCM_SHA384` | Automated Let's Encrypt / AWS ACM with 90-day rotation. |
+| **In-Transit (Internal Services)** | Mutual TLS (mTLS 1.3) | `TLS_CHACHA20_POLY1305_SHA256` | HashiCorp Vault Internal PKI with 30-day certificate validity. |
+| **At-Rest (Database & Caches)** | Block-level Volume Encryption | AES-256-XTS / AES-256-GCM | Cloud HSM Customer Managed Keys (CMK). |
+| **Field-Level Encryption (PHI)** | Application Envelope Encryption | AES-256-GCM | Unique Data Encryption Key (DEK) per tenant; encrypted by Key Encryption Key (KEK). |
 
 ---
 
-## 4. Cryptographic Audit Trail
+## 5. Non-Negotiable Audit Logging & Zero PHI Standard
 
-Every clinical action is permanently committed to an append-only audit table:
+CareDroid enforces an absolute separation between operational system logs and clinical patient records:
 
-```typescript
-interface ImmutableAuditEvent {
-  id: string; // UUIDv4
-  timestamp: string; // ISO 8601 UTC
-  userId: string; // Authenticated Practitioner ID
-  roleId: string; // Assigned Clinical Role Profile
-  actionType: string; // TRIAGE_OVERRIDE, ORDER_SIGN, DISPOSITION_CHANGE
-  patientId: string; // Anonymized internal encounter ID
-  priorState: string; // JSON delta before mutation
-  newState: string; // JSON delta after mutation
-  reasonCode?: string; // Required justification for clinical overrides
-  clientIpHash: string; // One-way salted hash of client network IP
-  digitalSignature: string; // HMAC-SHA256 signature chain of prior event hash + current
-}
-```
+1. **Zero PHI in Application Logs:** Application stdout, console logs, and Winston log aggregators record operational metadata only (`timestamp`, `correlationId`, `userIdHash`, `action`, `statusCode`, `durationMs`). Logging patient names, dates of birth, MRNs, health card numbers, or clinical notes is blocked by custom sanitizing formatters.
+2. **Immutable Audit Store:** Every clinical action, triage score override, medication calculation, and patient transfer is committed to an append-only PostgreSQL audit table (`workflow_action_log_entries`, `tool_result_audits`) replicated to write-once-read-many (WORM) storage.
 
 ---
+
+*This document establishes the binding security architecture and compliance requirements for CareDroid.*

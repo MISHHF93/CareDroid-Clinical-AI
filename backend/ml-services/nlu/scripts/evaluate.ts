@@ -41,7 +41,9 @@ function metricsFor(trueLabels: number[], predLabels: number[], numClasses: numb
 
   const precisions = perClass.map((c) => (c.tp + c.fp > 0 ? c.tp / (c.tp + c.fp) : 0));
   const recalls = perClass.map((c) => (c.tp + c.fn > 0 ? c.tp / (c.tp + c.fn) : 0));
-  const f1s = precisions.map((p, i) => (p + recalls[i] > 0 ? (2 * p * recalls[i]) / (p + recalls[i]) : 0));
+  const f1s = precisions.map((p, i) =>
+    p + recalls[i] > 0 ? (2 * p * recalls[i]) / (p + recalls[i]) : 0,
+  );
 
   const support = perClass.map((c) => c.tp + c.fn);
   const totalSupport = support.reduce((a, b) => a + b, 0) || 1;

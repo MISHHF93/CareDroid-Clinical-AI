@@ -146,9 +146,8 @@ describe('Emergency OS end-to-end integration', () => {
   let initialization: any;
 
   beforeAll(async () => {
-    ({ REQUIRED_SERVICE_NAMES, checkServiceHealth, initializeAllServices } = await import(
-      '../src/services'
-    ));
+    ({ REQUIRED_SERVICE_NAMES, checkServiceHealth, initializeAllServices } =
+      await import('../src/services'));
     ({ UnifiedPatient } = await import('../src/models/unified-patient.model'));
 
     mongoServer = await MongoMemoryServer.create({

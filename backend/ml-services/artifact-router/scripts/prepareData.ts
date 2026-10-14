@@ -22,7 +22,9 @@ function prepareArtifactRouterData(): void {
   const raw = loadArtifactTrainingCsv();
   const deduped = filterRouterExamples(raw).filter((row, index, rows) => {
     const key = row.inputText.trim().toLowerCase();
-    return rows.findIndex((candidate) => candidate.inputText.trim().toLowerCase() === key) === index;
+    return (
+      rows.findIndex((candidate) => candidate.inputText.trim().toLowerCase() === key) === index
+    );
   });
   let filtered = filterByMinClassSize(
     excludeArtifactTypes(enrichArtifactTypes(deduped)),
@@ -46,10 +48,22 @@ function prepareArtifactRouterData(): void {
   }
 
   console.log(`Loaded ${raw.length} artifact training rows`);
-  console.log(`Filtered to ${filtered.length} router examples (${TRAINING_CONFIG.labelTypes.join(', ')})`);
+  console.log(
+    `Filtered to ${filtered.length} router examples (${TRAINING_CONFIG.labelTypes.join(', ')})`,
+  );
 
-  const [train, rest] = stratifiedSplitByLabel(filtered, 0.2, TRAINING_CONFIG.seed, TRAINING_CONFIG.targetMode);
-  const [val, test] = stratifiedSplitByLabel(rest, 0.5, TRAINING_CONFIG.seed, TRAINING_CONFIG.targetMode);
+  const [train, rest] = stratifiedSplitByLabel(
+    filtered,
+    0.2,
+    TRAINING_CONFIG.seed,
+    TRAINING_CONFIG.targetMode,
+  );
+  const [val, test] = stratifiedSplitByLabel(
+    rest,
+    0.5,
+    TRAINING_CONFIG.seed,
+    TRAINING_CONFIG.targetMode,
+  );
   // Collapse + re-format hard examples so they cannot reintroduce rare types that
   // were already merged into `platform` (that previously ballooned class count
   // from 11 → 14 and diluted the head).
@@ -57,8 +71,12 @@ function prepareArtifactRouterData(): void {
     formatRouterExamples(enrichArtifactTypes(loadHardExamples())),
     TRAINING_CONFIG.targetMode,
   );
-  const knownLabels = new Set(filtered.map((row) => resolveLabelKey(row, TRAINING_CONFIG.targetMode)));
-  const safeHard = hardExamples.filter((row) => knownLabels.has(resolveLabelKey(row, TRAINING_CONFIG.targetMode)));
+  const knownLabels = new Set(
+    filtered.map((row) => resolveLabelKey(row, TRAINING_CONFIG.targetMode)),
+  );
+  const safeHard = hardExamples.filter((row) =>
+    knownLabels.has(resolveLabelKey(row, TRAINING_CONFIG.targetMode)),
+  );
   const mergedTrain = [...train, ...safeHard];
 
   writeJsonlDataset(MODEL_PATHS.trainData, mergedTrain);

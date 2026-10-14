@@ -14,13 +14,19 @@ const REPO_ROOT = path.resolve(ROUTER_ROOT, '..', '..', '..');
 export type ArtifactTargetMode = 'category' | 'artifact' | 'artifact-type';
 
 export const MODEL_CONFIG = {
-  embeddingModelName: process.env.ARTIFACT_EMBEDDING_MODEL ?? process.env.NLU_EMBEDDING_MODEL ?? 'Xenova/all-mpnet-base-v2',
+  embeddingModelName:
+    process.env.ARTIFACT_EMBEDDING_MODEL ??
+    process.env.NLU_EMBEDDING_MODEL ??
+    'Xenova/all-mpnet-base-v2',
 } as const;
 
 function parseCsvEnv(name: string, fallback: string[]): string[] {
   const raw = process.env[name];
   if (!raw?.trim()) return fallback;
-  return raw.split(',').map((v) => v.trim()).filter(Boolean);
+  return raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
 }
 
 export const TRAINING_CONFIG = {

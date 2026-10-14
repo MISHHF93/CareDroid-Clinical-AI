@@ -186,14 +186,14 @@
 }
 
 .emergency-route-maturity-chip--planned {
-  border: 1px solid rgba(156, 163, 175, 0.45);
-  background: rgba(156, 163, 175, 0.12);
+  border: 1px solid var(--cdl-border, #cbd5e1);
+  background: var(--cdl-surface-muted, #f1f5f9);
   color: var(--medical-text-disabled, #d1d5db);
 }
 
 .emergency-route-metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: var(--ed-space-3);
 }
 
@@ -243,8 +243,9 @@
   display: block;
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
@@ -261,6 +262,82 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 10px;
+}
+
+.emergency-route-patient-grid > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 140px;
+}
+
+.cdl-patient-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ed-space-3, 12px);
+  width: 100%;
+}
+
+.cdl-patient-grid-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--surface-secondary, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: var(--radius-md, 8px);
+  font-size: 13px;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.cdl-patient-grid-pagination--bottom {
+  margin-top: 4px;
+}
+
+.cdl-patient-grid-pagination strong {
+  color: var(--text-primary, #f1f5f9);
+}
+
+.cdl-patient-grid-pagination__page-count {
+  color: var(--text-muted, #64748b);
+  margin-left: 4px;
+}
+
+.cdl-patient-grid-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cdl-pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.06));
+  color: var(--text-primary, #f1f5f9);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cdl-pagination-btn:hover:not(:disabled) {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.12));
+  border-color: var(--border-hover, rgba(255, 255, 255, 0.2));
+}
+
+.cdl-pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cdl-pagination-counter {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  padding: 0 4px;
+  font-variant-numeric: tabular-nums;
 }
 
 .emergency-route-empty {
@@ -522,11 +599,52 @@
   color: var(--status-critical, #ef4444);
 }
 
+.emergency-route-stack--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emergency-route-recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--ed-space-3, 12px);
+  margin-top: var(--ed-space-2, 8px);
+}
+
+.emergency-route-recommendation-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--app-surface-raised, #ffffff);
+  border: 1px solid var(--app-border-subtle, rgba(226, 232, 240, 0.8));
+  border-left: 3px solid var(--app-accent, #0ea5e9);
+  border-radius: var(--radius-md, 8px);
+  padding: 12px 14px;
+  color: var(--app-text-primary, #0f172a);
+  font-size: 13px;
+  line-height: 1.45;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.emergency-route-recommendation-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--app-accent, #0ea5e9);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
 .emergency-route-recommendation {
+  display: inline-flex;
+  align-items: center;
   border-color: var(--app-border-subtle);
   background: var(--app-surface-muted);
   color: var(--app-text-secondary);
-  padding: var(--ed-space-3);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  border-radius: 6px;
 }
 
 .emergency-route-signal-grid {
@@ -733,4 +851,173 @@
   .emergency-command-action__meta {
     grid-template-columns: 1fr;
   }
+}
+
+/* Treatment Spaces & Bays Grid */
+.emergency-route-rooms-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ed-space-3);
+  margin-top: var(--ed-space-4);
+}
+
+.emergency-route-rooms-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ed-space-2);
+}
+
+.emergency-route-rooms-title {
+  margin: 0;
+  font-size: var(--font-size-base, 16px);
+  font-weight: 700;
+  color: var(--ed-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.emergency-route-rooms-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emergency-route-rooms-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.emergency-route-rooms-badge--available {
+  background: var(--status-success-subtle, rgba(16, 185, 129, 0.12));
+  color: var(--status-success-text, #059669);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.emergency-route-rooms-badge--occupied {
+  background: var(--status-info-subtle, rgba(14, 165, 233, 0.12));
+  color: var(--status-info-text, #0284c7);
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.emergency-route-rooms-badge--blocked {
+  background: var(--status-critical-subtle, rgba(239, 68, 68, 0.12));
+  color: var(--status-critical-text, #dc2626);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.emergency-route-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: var(--ed-space-3);
+}
+
+.emergency-route-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: var(--cdl-clinical-radius, 10px);
+  background: var(--ed-surface-raised, #ffffff);
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  box-shadow: var(--cdl-clinical-shadow-rest, 0 1px 3px rgba(0, 0, 0, 0.04));
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.emergency-route-room-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.emergency-route-room-card--available {
+  border-left: 3px solid #10b981;
+}
+
+.emergency-route-room-card--occupied {
+  border-left: 3px solid #0ea5e9;
+}
+
+.emergency-route-room-card--blocked {
+  border-left: 3px solid #ef4444;
+  background: color-mix(in srgb, #ef4444 3%, #ffffff);
+}
+
+.emergency-route-room-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.emergency-route-room-card__name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.emergency-route-room-card__status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: capitalize;
+}
+
+.emergency-route-room-card__status--available {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.emergency-route-room-card__status--occupied {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+}
+
+.emergency-route-room-card__status--blocked {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.emergency-route-room-card__type {
+  font-size: 11px;
+  color: var(--ed-text-secondary, #64748b);
+  font-weight: 500;
+}
+
+.emergency-route-room-card__patient {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--ed-border-subtle, #f1f5f9);
+  min-height: 22px;
+}
+
+.emergency-route-room-card__patient-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  flex-shrink: 0;
+}
+
+.emergency-route-room-card__patient-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ed-text-primary, #1e293b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emergency-route-room-card__subtext {
+  font-size: 11px;
+  color: var(--ed-text-muted, #94a3b8);
 }
